@@ -8,12 +8,14 @@
 
 #import "NameTableView.h"
 
-@implementation NameTableView{
-    UITableView *menuView;
-}
+
+@implementation NameTableView
+
+@synthesize menuView;
 
 - (id)initWithFrame:(CGRect)frame
 {
+    NSLog(@"initwithframe");
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
@@ -25,6 +27,7 @@
 }
 
 -(id)initWithCoder:(NSCoder *)aDecoder{
+    NSLog(@"initwithcoder");
     self = [super initWithCoder:aDecoder];
     if(self){
         [self setup];
@@ -33,11 +36,15 @@
 }
 
 -(void)setup{
-    menuView = [[UITableView alloc]initWithFrame:self.bounds];
-    menuView.backgroundColor = [UIColor clearColor];
+    NSLog(@"setup");
+    self.menuView = [[UITableView alloc]initWithFrame:self.bounds];
+    self.menuView.backgroundColor = [UIColor clearColor];
+    self.menuView.delegate = self;
+    self.menuView.dataSource = self;
     [self addSubview:menuView];
     
     self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5f];
+    [self.menuView reloadData];
 }
 
 /*
@@ -55,13 +62,44 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
-    return 10;
+    return 100;
 }
 
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    return nil;
+    NSString *cellIdentifier = @"Cell1";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if(cell == nil){
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+    }
+    
+    cell.backgroundColor = [UIColor clearColor];
+    UILabel *label = [[UILabel alloc]initWithFrame:cell.bounds];
+    label.text = [NSString stringWithFormat:@"cell:%d", (int)indexPath.row];
+    label.font = [UIFont systemFontOfSize:10.f];
+    [cell.contentView addSubview:label];
+    NSLog(@"cellForRowAtIndexPath = %d", (int)indexPath.row);
+    
+    
+    return cell;
 }
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    return 15.0f;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    
+    return 10.0f;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
+    
+    return 10.0f;
+}
+
+
 
 @end

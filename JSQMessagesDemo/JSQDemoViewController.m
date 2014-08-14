@@ -157,9 +157,13 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     [self.view addGestureRecognizer:panGesture];
     
     
+    NSLog(@"add table");
     
     //panすると左からスライドするメニュー
-    
+    NameTableView *tableView = [[NameTableView alloc]initWithFrame:
+                                CGRectMake(50, 100, 100, 200)];
+    [tableView.menuView reloadData];
+    [self.view addSubview:tableView];
 }
 
 -(void)panned:(id)sender{

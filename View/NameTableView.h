@@ -10,4 +10,6 @@
 
 @interface NameTableView : UIView<UITableViewDataSource,UITableViewDelegate>
 
+@property (nonatomic, strong) UITableView *menuView;
+
 @end

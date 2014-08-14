@@ -17,6 +17,7 @@
 //
 
 #import "JSQMessages.h"
+#import "NameTableView.h"
 
 @class JSQDemoViewController;
 
