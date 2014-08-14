@@ -16,4 +16,19 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
+
+    //#import "GAITracker.h"
+    //#import "BSBuyerAPIClient.h"
+    #import "BSSellerAPIClient.h"
+    //#import "BSCommonAPIClient.h"
+    #import "BSUserManager.h"
+    #import "BSDefaultViewObject.h"
+    //#import "AppDelegate.h"
+    //#import "BSPublicAPIClient.h"
+    #import "AFNetworking.h"
+    //#import "GAIDictionaryBuilder.h"
+    #import "UICKeyChainStore.h"
+    #import "SVProgressHUD.h"
+    #import "UIImageView+WebCache.h"
+
 #endif

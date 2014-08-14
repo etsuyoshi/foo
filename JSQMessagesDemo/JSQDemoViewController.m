@@ -19,7 +19,7 @@
 #import "JSQDemoViewController.h"
 
 
-static NSString * const kJSQDemoAvatarNameCook = @"Tim Cook";
+static NSString * const kJSQDemoAvatarNameCook = @"じんぐうじ";//Tim Cook";
 static NSString * const kJSQDemoAvatarNameJobs = @"Jobs";
 static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 
@@ -36,12 +36,19 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
      *  You should have a mutable array or orderedSet, or something.
      */
     self.messages = [[NSMutableArray alloc] initWithObjects:
-                     [[JSQMessage alloc] initWithText:@"Welcome to JSQMessages: A messaging UI framework for iOS." sender:self.sender date:[NSDate distantPast]],
-                     [[JSQMessage alloc] initWithText:@"It is simple, elegant, and easy to use. There are super sweet default settings, but you can customize like crazy." sender:kJSQDemoAvatarNameWoz date:[NSDate distantPast]],
-                     [[JSQMessage alloc] initWithText:@"It even has data detectors. You can call me tonight. My cell number is 123-456-7890. My website is www.hexedbits.com." sender:self.sender date:[NSDate distantPast]],
-                     [[JSQMessage alloc] initWithText:@"JSQMessagesViewController is nearly an exact replica of the iOS Messages App. And perhaps, better." sender:kJSQDemoAvatarNameJobs date:[NSDate date]],
-                     [[JSQMessage alloc] initWithText:@"It is unit-tested, free, and open-source." sender:kJSQDemoAvatarNameCook date:[NSDate date]],
-                     [[JSQMessage alloc] initWithText:@"Oh, and there's sweet documentation." sender:self.sender date:[NSDate date]],
+                     
+                     [[JSQMessage alloc] initWithText:@"できたよ！" sender:self.sender date:[NSDate distantPast]],
+                     [[JSQMessage alloc] initWithText:@"まじかよ！" sender:kJSQDemoAvatarNameWoz date:[NSDate distantPast]],
+                     [[JSQMessage alloc] initWithText:@"遠藤天才？" sender:self.sender date:[NSDate distantPast]],
+                     [[JSQMessage alloc] initWithText:@"次は神宮司さんからjsonを！" sender:kJSQDemoAvatarNameJobs date:[NSDate date]],
+                     [[JSQMessage alloc] initWithText:@"はよ" sender:kJSQDemoAvatarNameCook date:[NSDate date]],
+                     [[JSQMessage alloc] initWithText:@"遠藤です" sender:self.sender date:[NSDate date]],
+//                     [[JSQMessage alloc] initWithText:@"Welcome to JSQMessages: A messaging UI framework for iOS." sender:self.sender date:[NSDate distantPast]],
+//                     [[JSQMessage alloc] initWithText:@"It is simple, elegant, and easy to use. There are super sweet default settings, but you can customize like crazy." sender:kJSQDemoAvatarNameWoz date:[NSDate distantPast]],
+//                     [[JSQMessage alloc] initWithText:@"It even has data detectors. You can call me tonight. My cell number is 123-456-7890. My website is www.hexedbits.com." sender:self.sender date:[NSDate distantPast]],
+//                     [[JSQMessage alloc] initWithText:@"JSQMessagesViewController is nearly an exact replica of the iOS Messages App. And perhaps, better." sender:kJSQDemoAvatarNameJobs date:[NSDate date]],
+//                     [[JSQMessage alloc] initWithText:@"It is unit-tested, free, and open-source." sender:kJSQDemoAvatarNameCook date:[NSDate date]],
+//                     [[JSQMessage alloc] initWithText:@"Oh, and there's sweet documentation." sender:self.sender date:[NSDate date]],
                      nil];
     
     /**
@@ -61,13 +68,13 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     
     CGFloat incomingDiameter = self.collectionView.collectionViewLayout.incomingAvatarViewSize.width;
     
-    UIImage *cookImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"demo_avatar_cook"]
+    UIImage *cookImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"jin1"]//demo_avatar_cook"]
                                                           diameter:incomingDiameter];
     
-    UIImage *jobsImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"demo_avatar_jobs"]
+    UIImage *jobsImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"takkun"]//demo_avatar_jobs"]
                                                           diameter:incomingDiameter];
     
-    UIImage *wozImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"demo_avatar_woz"]
+    UIImage *wozImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"tanaka"]//demo_avatar_woz"]
                                                          diameter:incomingDiameter];
     self.avatars = @{ self.sender : jsqImage,
                       kJSQDemoAvatarNameCook : cookImage,
@@ -141,8 +148,23 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
                                                                               style:UIBarButtonItemStyleBordered
                                                                              target:self
                                                                              action:@selector(receiveMessagePressed:)];
+    
+    
+    //panGesture
+    UIPanGestureRecognizer *panGesture =
+    [[UIPanGestureRecognizer alloc]
+     initWithTarget:self action:@selector(panned:)];
+    [self.view addGestureRecognizer:panGesture];
+    
+    
+    
+    //panすると左からスライドするメニュー
+    
 }
 
+-(void)panned:(id)sender{
+    NSLog(@"panned");
+}
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
