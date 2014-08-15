@@ -20,6 +20,9 @@
 
 @implementation JSQTableViewController{
     NSArray *arrPhrase;
+    
+    UITextField *textField;
+    UIView *viewUnderKeyboard;
 }
 
 #pragma mark - View lifecycle
@@ -38,6 +41,12 @@
     self.navigationItem.rightBarButtonItem = backButton;
     
     arrPhrase = [NSArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
+    
+    //cellが反応しない
+//    UITapGestureRecognizer *gestureRecognizer =
+//    [[UITapGestureRecognizer alloc]
+//     initWithTarget:self action:@selector(closeSoftKeyboard)];
+//    [self.view addGestureRecognizer:gestureRecognizer];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -48,8 +57,97 @@
     [self.tableView reloadData];
 }
 
+//-(void)closeSoftKeyboard{
+//    [self.view endEditing:YES];
+//}
+
 -(void)add{
+//    //keyboardを立ち上げる
+//    UITextField *textField = [[UITextField alloc]init];
+//    [self.view addSubview:textField];
+//    // キーボードを出す
+//    [textField becomeFirstResponder];
     
+    //念のため一旦隠す
+    [self dismissKeyBoard];
+    
+    
+    
+    
+    viewUnderKeyboard =
+    [[UIView alloc]
+     initWithFrame:self.view.bounds];
+//     CGRectMake(0, 0,
+//                self.view.bounds.size.width,
+//                self.view.bounds.size.height)];
+    viewUnderKeyboard.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.f];
+    [self.view addSubview:viewUnderKeyboard];
+    
+    UITapGestureRecognizer *singleFingerTap =
+    [[UITapGestureRecognizer alloc]
+     initWithTarget:self
+     action:@selector(dismissKeyBoard)];
+
+    [viewUnderKeyboard addGestureRecognizer:singleFingerTap];
+    
+    
+    
+    
+    //
+    textField = [[UITextField alloc]init];
+    [viewUnderKeyboard addSubview:textField];
+    
+    // ボタンを配置するUIViewを作成
+    UIView* accessoryView = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,44)];
+    accessoryView.backgroundColor = [UIColor whiteColor];
+    
+    // ボタンを作成
+    UIButton* closeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    closeButton.frame = CGRectMake(210,5,100,30);
+    [closeButton setTitle:@"決定" forState:UIControlStateNormal];
+    
+    // ボタンを押したときに呼ばれる動作を設定
+    [closeButton
+     addTarget:self
+     action:@selector(determine)
+     forControlEvents:UIControlEventTouchUpInside];
+    
+    // ボタンをViewに追加
+    [accessoryView addSubview:closeButton];
+    
+    // ビューをUITextFieldのinputAccessoryViewに設定
+    textField.inputAccessoryView = accessoryView;
+    
+    [textField becomeFirstResponder];
+    
+    [UIView
+     animateWithDuration:0.8f
+     animations:^{
+         viewUnderKeyboard.backgroundColor =
+         [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5f];
+     }
+     completion:^(BOOL finished){
+         
+     }];
+    
+}
+
+//決定ボタンを押したとき
+-(void)determine{
+    NSLog(@"determine : text = %@", textField.text);
+    [self dismissKeyBoard];
+    
+    //合い言葉があってればtableViewの行を一つ増やす
+    
+}
+
+//キーボードを消すのみ
+-(void)dismissKeyBoard{
+    NSLog(@"dismissKeyboard");
+    textField = nil;
+    [viewUnderKeyboard removeFromSuperview];
+    viewUnderKeyboard = nil;
+
 }
 
 #pragma mark - Table view data source
@@ -107,6 +205,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
     if (indexPath.section == 0) {
 //        switch (indexPath.row) {
 //            case 0:
