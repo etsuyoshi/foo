@@ -16,7 +16,13 @@
 //  Released under an MIT license: http://opensource.org/licenses/MIT
 //
 
+
+//sendボタンを完了ボタンにして押下後キーボード消去[self.view endEditing:YES];
+
+
 #import "JSQDemoViewController.h"
+#import "PersonViewController.h"
+#import "DataConnect.h"
 
 
 static NSString * const kJSQDemoAvatarNameCook = @"じんぐうじ";//Tim Cook";
@@ -24,7 +30,12 @@ static NSString * const kJSQDemoAvatarNameJobs = @"Jobs";
 static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 
 
-@implementation JSQDemoViewController
+@implementation JSQDemoViewController{
+    float firstX;
+    float firstY;
+    
+    NameTableView *tableView;
+}
 
 #pragma mark - Demo setup
 
@@ -118,9 +129,82 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 {
     [super viewDidLoad];
     
-    self.title = @"JSQMessages";
+    self.title = @"base time line";
     
     self.sender = @"Jesse Squires";
+    
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+    
+    NSString *strDeviceKey = store[@"device_key"];
+    NSLog(@"strDeviceKey = %@", strDeviceKey);
+    
+    if([strDeviceKey isEqual:[NSNull null]] ||
+       strDeviceKey == nil){
+        
+        [SVProgressHUD
+         showWithStatus:@"アカウント取得中..."
+         maskType:SVProgressHUDMaskTypeGradient];
+        
+        [[DataConnect sharedClient]
+         createUserCompletion:^(NSDictionary *userInfo,
+                      NSURLSessionDataTask *task,
+                      NSError *error){
+             
+             
+             
+             NSLog(@"userinfo = %@", userInfo);
+             
+             if([userInfo[@"succeed"] integerValue] == 1){
+                 
+                 NSLog(@"アカウント発行：jsonData ... %@",
+                       userInfo);
+                 
+                 [store setString:userInfo[@"user"][@"account_id"]
+                           forKey:@"account_id"];
+                 [store setString:userInfo[@"user"][@"name"]
+                           forKey:@"name"];
+                 [store setString:userInfo[@"user"][@"device_key"]
+                           forKey:@"device_key"];
+                 
+                 NSLog(@"設定後: account_id=%@, name=%@, devicekey = %@",
+                       store[@"account_id"],
+                       store[@"name"],
+                       store[@"device_key"]);
+                 [store synchronize];
+                 
+                 [SVProgressHUD showSuccessWithStatus:@"受信完了！"];
+                 
+                 //                 NSLog(@"格納後 = %@", )
+             }else{
+                 NSLog(@"read data failure");
+                 [SVProgressHUD showSuccessWithStatus:@"受信失敗！"];
+             }
+         }];
+    }else{//デバイスキーがそもそも存在すれば
+        [SVProgressHUD showSuccessWithStatus:@"アカウントを確認しました!"];
+    }
+
+    
+    
+    
+    
+    //navigationBarのアイテムの編集
+//    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(10, 10, 100, 70)];
+//    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+//    button.frame = CGRectMake(10, 10, 100, 70);
+//    [button addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+////    [button setImage:[UIImage imageNamed:normalImage] forState:UIControlStateNormal];
+//    button.titleLabel.text = @"config";
+//    button.titleLabel.textColor = [UIColor blackColor];
+//    
+////    UIBarButtonItem *item; = [[UIBarButtonItem alloc] initWithCustomView:button];
+//
+//    
+//    UIBarButtonItem *barLeftButtonItem = [[UIBarButtonItem alloc]initWithCustomView:button];
+//    barLeftButtonItem.title = @"config";
+////    barLeftButtonItem.tintColor = [UIColor redColor];
+//    self.navigationItem.leftBarButtonItem = barLeftButtonItem;
+    
     
     [self setupTestModel];
     
@@ -144,39 +228,134 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     self.incomingBubbleImageView = [JSQMessagesBubbleImageFactory
                                     incomingMessageBubbleImageViewWithColor:[UIColor jsq_messageBubbleGreenColor]];
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"typing"]
-                                                                              style:UIBarButtonItemStyleBordered
-                                                                             target:self
-                                                                             action:@selector(receiveMessagePressed:)];
+    self.navigationItem.rightBarButtonItem =
+    [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"typing"]
+                                     style:UIBarButtonItemStyleBordered
+                                    target:self
+                                    action:@selector(receiveMessagePressed:)];
+
     
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
+                                   initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                   target:self
+                                   action:@selector(back)];
+    // Here I think you wanna add the searchButton and not the filterButton..
+    self.navigationItem.leftBarButtonItem = backButton;
     
-    //panGesture
-    UIPanGestureRecognizer *panGesture =
-    [[UIPanGestureRecognizer alloc]
-     initWithTarget:self action:@selector(panned:)];
-    [self.view addGestureRecognizer:panGesture];
     
     
     NSLog(@"add table");
     
     //panすると左からスライドするメニュー
-    NameTableView *tableView = [[NameTableView alloc]initWithFrame:
-                                CGRectMake(50, 100, 100, 200)];
+    tableView =
+    [[NameTableView alloc]initWithFrame:
+     CGRectMake(0, 0, self.view.bounds.size.width*3/4, self.view.bounds.size.height)];
     [tableView.menuView reloadData];
     [self.view addSubview:tableView];
+    
+    //ジェスチャーをつけるのはself.viewにしてpannedメソッドの中で動かすものだけtableViewにする
+    //panGesture or - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+    UIPanGestureRecognizer *panGesture =
+    [[UIPanGestureRecognizer alloc]
+     initWithTarget:self action:@selector(panned:)];//動かす対
+    [self.view addGestureRecognizer:panGesture];//タッチする対象？
+}
+-(void)back{
+    NSLog(@"back");
+    [self.navigationController popViewControllerAnimated:YES];
+}
+-(void)panned:(UIPanGestureRecognizer *)sender{
+    NSLog(@"panned %@", [(UIPanGestureRecognizer *)sender view]);
+    
+//    [self.view bringSubviewToFront:[(UIPanGestureRecognizer*)sender view]];
+    [self.view bringSubviewToFront:tableView];//[(UIPanGestureRecognizer *)sender view]];
+//    CGPoint translatedPoint = [(UIPanGestureRecognizer*)sender translationInView:self.view];
+    CGPoint translatedPoint = [(UIPanGestureRecognizer *)sender translationInView:tableView];
+    
+    if ([(UIPanGestureRecognizer*)sender state] == UIGestureRecognizerStateBegan) {
+//        firstX = [[sender view] center].x;
+//        firstY = [[sender view] center].y;
+        firstX = tableView.center.x;
+        firstY = tableView.center.y;
+    }
+    
+    //横位置動作のみ
+//    if(firstX + translatedPoint.x < self.view.center.x/2)
+        translatedPoint = CGPointMake(firstX+translatedPoint.x, firstY);
+    
+//    [[sender view] setCenter:translatedPoint];
+    [tableView setCenter:translatedPoint];
+    
+    if ([(UIPanGestureRecognizer*)sender state] == UIGestureRecognizerStateEnded) {
+//        CGFloat velocityX = (0.2*[(UIPanGestureRecognizer*)sender velocityInView:self.view].x);
+        CGFloat velocityX = (0.2*[(UIPanGestureRecognizer *)sender velocityInView:tableView].x);
+        
+        
+        CGFloat finalX = translatedPoint.x + velocityX;
+        CGFloat finalY = firstY;// translatedPoint.y + (.35*[(UIPanGestureRecognizer*)sender velocityInView:self.view].y);
+        
+        if (UIDeviceOrientationIsPortrait([[UIDevice currentDevice] orientation])) {
+            if (finalX < 0) {
+                //finalX = 0;
+            } else if (finalX > 768) {
+                //finalX = 768;
+            }
+            
+            if (finalY < 0) {
+                finalY = 0;
+            } else if (finalY > 1024) {
+                finalY = 1024;
+            }
+        } else {
+            if (finalX < 0) {
+                //finalX = 0;
+            } else if (finalX > 1024) {
+                //finalX = 768;
+            }
+            
+            if (finalY < 0) {
+                finalY = 0;
+            } else if (finalY > 768) {
+                finalY = 1024;
+            }
+        }
+        
+        CGFloat animationDuration = (ABS(velocityX)*.0002)+.2;
+        
+        NSLog(@"the duration is: %f", animationDuration);
+        
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:animationDuration];
+        [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+        [UIView setAnimationDelegate:self];
+        [UIView setAnimationDidStopSelector:@selector(animationDidFinish)];
+//        [[sender view] setCenter:CGPointMake(finalX, finalY)];
+//        if(finalX < self.view.center.x/2){
+            [tableView setCenter:CGPointMake(finalX, finalY)];
+//        }
+        [UIView commitAnimations];
+    }
+    
+    
 }
 
--(void)panned:(id)sender{
-    NSLog(@"panned");
+-(void)animationDidFinish{
+    NSLog(@"animate finished");
+}
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
+    NSLog(@"touches count : %d (touchesMoved:withEvent:)", (int)touches.count);
+    
 }
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
     if (self.delegateModal) {
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
-                                                                                              target:self
-                                                                                              action:@selector(closePressed:)];
+        self.navigationItem.leftBarButtonItem =
+        [[UIBarButtonItem alloc]
+         initWithBarButtonSystemItem:UIBarButtonSystemItemStop
+         target:self
+         action:@selector(closePressed:)];
     }
 }
 
@@ -262,12 +441,98 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
      *  2. Add new id<JSQMessageData> object to your data source
      *  3. Call `finishSendingMessage`
      */
+    
+    NSLog(@"didPressSendButton");
+    
     [JSQSystemSoundPlayer jsq_playMessageSentSound];
     
-    JSQMessage *message = [[JSQMessage alloc] initWithText:text sender:sender date:date];
-    [self.messages addObject:message];
     
-    [self finishSendingMessage];
+    
+    JSQMessage *message = [[JSQMessage alloc] initWithText:text sender:sender date:date];
+    
+    
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+    
+//    NSString *strDeviceKey = store[@"device_key"];
+    
+    if(store[@"time_line_id"]){
+        
+        NSLog(@"time_line_id = %@", store[@"time_line_id"]);
+        //return;
+    }
+    //あと、/messages/postの引数のmembersは普通に配列として投げてやれば受け取れるんですかね？
+    [[DataConnect sharedClient]
+     sendMessage:(NSString *)message
+     deviceKey:(NSString *)store[@"device_key"]
+     timeLineId:(NSString *)store[@"time_line_id"]
+     members:(NSArray *)[NSArray arrayWithObjects:@"taro", @"jiro", nil]
+     completion:^(NSDictionary *userInfo,
+                  NSURLSessionDataTask *task,
+                  NSError *error){
+         
+         /*
+          //timelineidが見つからない場合
+          userinfo={
+          message = "not found current account id";
+          succeed = 0;
+          }
+          
+          //成功した場合
+         succeed = 1;
+         "time_line" =     {
+             "host_id" = 107;
+             id = 16;
+             members =         (
+                                {
+                                    "account_id" = jiro;
+                                    id = 84;
+                                    name = JIRO;
+                                },
+                                {
+                                    "account_id" = taro;
+                                    id = 85;
+                                    name = TARO;
+                                }
+                                );
+             name = "JIRO, TARO";
+         };
+     }
+     */
+
+         
+         
+         
+         NSLog(@"userinfo=%@", userInfo);
+         if(userInfo == nil ||
+            [userInfo isEqual:[NSNull null]]){
+             [self dispSendError:0];
+             return;
+         }else if([userInfo[@"succeed"] intValue] == 1){
+             NSLog(@"userinfo[succeed]=%d", [userInfo[@"succeed"] intValue]);
+             [SVProgressHUD showSuccessWithStatus:@"送信しました!"];
+             [SVProgressHUD showSuccessWithStatus:[NSString stringWithFormat:@"%@", userInfo]];
+             [self.messages addObject:message];
+             [self finishSendingMessage];
+         }else{
+             [self dispSendError:1];
+         }
+     }];
+    
+}
+
+-(void)dispSendError:(int)errorNo{
+    /**
+     **エラーコード
+     *0:インターネット通信はあるけどサーバーから返ってきた値がsucceedが０だった場合
+     *1:インターネット通信がない場合
+     */
+    if(errorNo == 0){
+        [SVProgressHUD showSuccessWithStatus:
+         [NSString stringWithFormat:@"メッセージの送信に失敗しました。\nerrorcode=%d", errorNo]];
+    }else if(errorNo == 1){
+        [SVProgressHUD showSuccessWithStatus:
+         [NSString stringWithFormat:@"サーバーとの通信に失敗しました。\nerrorcode=%d", errorNo]];
+    }
 }
 
 - (void)didPressAccessoryButton:(UIButton *)sender
@@ -313,6 +578,7 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 - (UIImageView *)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageViewForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     /**
+     
      *  Return `nil` here if you do not want avatars.
      *  If you do return `nil`, be sure to do the following in `viewDidLoad`:
      *
@@ -483,5 +749,22 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 {
     NSLog(@"Load earlier messages!");
 }
+
+-(void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath{
+//    NSLog(@"aaa");
+}
+
+-(void)collectionView:(JSQMessagesCollectionView *)collectionView didTapAvatarImageView:(UIImageView *)avatarImageView atIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"tapped avatar imageView");
+    
+    [self pushedPerson:[NSString stringWithFormat:@"person %d", indexPath.row]];
+}
+
+-(void)pushedPerson:(NSString *)name{
+    PersonViewController *vc = [[PersonViewController alloc]init];
+    vc.title = name;//navigationControllerにはデフォルトでtitleフィールドが存在する
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
 
 @end

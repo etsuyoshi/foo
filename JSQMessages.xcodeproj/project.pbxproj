@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A23FF94199DB0BF009BA3CD /* PersonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A23FF93199DB0BF009BA3CD /* PersonViewController.m */; };
+		2A23FF97199DD997009BA3CD /* DataConnect.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A23FF95199DD997009BA3CD /* DataConnect.m */; };
 		2A7A7E9E19814357004869D1 /* BSSellerAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7A7E9B19814357004869D1 /* BSSellerAPIClient.m */; };
 		2A7A7E9F19814357004869D1 /* BSUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7A7E9D19814357004869D1 /* BSUserManager.m */; };
 		2A91678B199D245D00C61D48 /* NameTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A91678A199D245D00C61D48 /* NameTableView.m */; };
@@ -118,6 +120,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2A23FF92199DB0BF009BA3CD /* PersonViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PersonViewController.h; path = JSQMessagesDemo/PersonViewController.h; sourceTree = SOURCE_ROOT; };
+		2A23FF93199DB0BF009BA3CD /* PersonViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PersonViewController.m; path = JSQMessagesDemo/PersonViewController.m; sourceTree = SOURCE_ROOT; };
+		2A23FF95199DD997009BA3CD /* DataConnect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataConnect.m; sourceTree = SOURCE_ROOT; };
+		2A23FF96199DD997009BA3CD /* DataConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataConnect.h; sourceTree = SOURCE_ROOT; };
 		2A7A7E9A19814357004869D1 /* BSSellerAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSSellerAPIClient.h; sourceTree = SOURCE_ROOT; };
 		2A7A7E9B19814357004869D1 /* BSSellerAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BSSellerAPIClient.m; sourceTree = SOURCE_ROOT; };
 		2A7A7E9C19814357004869D1 /* BSUserManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSUserManager.h; sourceTree = SOURCE_ROOT; };
@@ -288,6 +294,8 @@
 		2A7A7E99198141D3004869D1 /* API */ = {
 			isa = PBXGroup;
 			children = (
+				2A23FF96199DD997009BA3CD /* DataConnect.h */,
+				2A23FF95199DD997009BA3CD /* DataConnect.m */,
 				2AB814AF1981485600A8A499 /* BSDefaultViewObject.m */,
 				2AB814B01981485600A8A499 /* BSDefaultViewObject.h */,
 				2A7A7E9A19814357004869D1 /* BSSellerAPIClient.h */,
@@ -520,6 +528,8 @@
 				885D596618CBD2A600D77BB3 /* JSQAppDelegate.m */,
 				8897FBF718CBF967004F59C3 /* JSQDemoViewController.h */,
 				8897FBF818CBF967004F59C3 /* JSQDemoViewController.m */,
+				2A23FF92199DB0BF009BA3CD /* PersonViewController.h */,
+				2A23FF93199DB0BF009BA3CD /* PersonViewController.m */,
 				885D596718CBD2A600D77BB3 /* JSQTableViewController.h */,
 				885D596818CBD2A600D77BB3 /* JSQTableViewController.m */,
 				885D596C18CBD2BF00D77BB3 /* Main.storyboard */,
@@ -830,6 +840,7 @@
 				8816A6AE18E9250400111919 /* JSQMessagesCollectionView.m in Sources */,
 				2A7A7E9E19814357004869D1 /* BSSellerAPIClient.m in Sources */,
 				8816A6AB18E9250400111919 /* JSQMessagesCollectionViewFlowLayout.m in Sources */,
+				2A23FF97199DD997009BA3CD /* DataConnect.m in Sources */,
 				8816A6B518E9250400111919 /* JSQMessagesInputToolbar.m in Sources */,
 				2A7A7E9F19814357004869D1 /* BSUserManager.m in Sources */,
 				88BC4D33190C6057002E5CC6 /* JSQMessagesLoadEarlierHeaderView.m in Sources */,
@@ -846,6 +857,7 @@
 				8816A6A818E9250400111919 /* JSQMessagesBubbleImageFactory.m in Sources */,
 				8816A6AD18E9250400111919 /* JSQMessage.m in Sources */,
 				8897FBF918CBF967004F59C3 /* JSQDemoViewController.m in Sources */,
+				2A23FF94199DB0BF009BA3CD /* PersonViewController.m in Sources */,
 				8816A6AF18E9250400111919 /* JSQMessagesCollectionViewCell.m in Sources */,
 				885D596B18CBD2A600D77BB3 /* JSQTableViewController.m in Sources */,
 				8816A6B618E9250400111919 /* JSQMessagesLabel.m in Sources */,
@@ -1014,7 +1026,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "JSQMessagesDemo/JSQMessages-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/JSQMessagesDemo/JSQMessages-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -1033,7 +1045,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "JSQMessagesDemo/JSQMessages-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/JSQMessagesDemo/JSQMessages-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";

@@ -41,10 +41,10 @@
     self.menuView.backgroundColor = [UIColor clearColor];
     self.menuView.delegate = self;
     self.menuView.dataSource = self;
-    [self addSubview:menuView];
-    
     self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5f];
     [self.menuView reloadData];
+    [self addSubview:menuView];
+    
 }
 
 /*
@@ -75,11 +75,19 @@
     }
     
     cell.backgroundColor = [UIColor clearColor];
-    UILabel *label = [[UILabel alloc]initWithFrame:cell.bounds];
-    label.text = [NSString stringWithFormat:@"cell:%d", (int)indexPath.row];
-    label.font = [UIFont systemFontOfSize:10.f];
-    [cell.contentView addSubview:label];
-    NSLog(@"cellForRowAtIndexPath = %d", (int)indexPath.row);
+    
+    
+    for(id view in cell.contentView.subviews){
+        [view removeFromSuperview];
+    }
+    
+    if(cell.contentView.subviews.count == 0){
+        UILabel *label = [[UILabel alloc]initWithFrame:cell.bounds];
+        label.text = [NSString stringWithFormat:@"cell:%d", (int)indexPath.row];
+        label.font = [UIFont systemFontOfSize:10.f];
+        [cell.contentView addSubview:label];
+        NSLog(@"cellForRowAtIndexPath = %d", (int)indexPath.row);
+    }
     
     
     return cell;
@@ -87,7 +95,7 @@
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    return 15.0f;
+    return 27.0f;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
@@ -100,6 +108,18 @@
     return 10.0f;
 }
 
-
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"tapped cell=%d in tableView", indexPath.row);
+    
+    
+    
+    [UIView animateWithDuration:0.5f
+                     animations:^{
+                         self.center = CGPointMake(-self.bounds.size.width, self.center.y);
+                     }
+                     completion:^(BOOL finished){
+                         
+                     }];
+}
 
 @end

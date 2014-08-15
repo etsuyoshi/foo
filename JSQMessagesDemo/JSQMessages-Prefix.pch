@@ -30,5 +30,6 @@
     #import "UICKeyChainStore.h"
     #import "SVProgressHUD.h"
     #import "UIImageView+WebCache.h"
+    #import "DataConnect.h"
 
 #endif
