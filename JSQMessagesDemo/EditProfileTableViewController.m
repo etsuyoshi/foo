@@ -300,6 +300,7 @@
 }
 
 -(void)dispError:(NSString *) errorContents{
+    NSLog(@"disperror");
     [SVProgressHUD showSuccessWithStatus:
      [NSString stringWithFormat:@"%@", errorContents]];
 }
