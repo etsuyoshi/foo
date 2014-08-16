@@ -17,6 +17,7 @@
 //
 
 #import "JSQTableViewController.h"
+#import "EditProfileTableViewController.h"
 
 @implementation JSQTableViewController{
     NSMutableArray *arrPhrase;
@@ -35,11 +36,17 @@
     
     
     
+    UIBarButtonItem *editButton =
+    [[UIBarButtonItem alloc]
+     initWithBarButtonSystemItem:UIBarButtonSystemItemEdit
+     target:self
+     action:@selector(edit)];
+    self.navigationItem.leftBarButtonItem = editButton;
     
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc]
                                    initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                    target:self
-                                   action:@selector(add)];
+                                   action:@selector(addId)];
     // Here I think you wanna add the searchButton and not the filterButton..
     self.navigationItem.rightBarButtonItem = addButton;
     
@@ -68,7 +75,13 @@
 //    [self.view endEditing:YES];
 //}
 
--(void)add{
+-(void)edit{
+    NSLog(@"編集中...");
+    EditProfileTableViewController *vc = [[EditProfileTableViewController alloc]init];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+//
+-(void)addId{
 //    //keyboardを立ち上げる
 //    UITextField *textField = [[UITextField alloc]init];
 //    [self.view addSubview:textField];
@@ -338,4 +351,13 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+
+//?
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+//    if(tableView == tableViewA)
+//        return UITableViewCellEditingStyleNone;
+//    else
+        return UITableViewCellEditingStyleDelete;
+}
 @end

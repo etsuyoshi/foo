@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2A23FF94199DB0BF009BA3CD /* PersonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A23FF93199DB0BF009BA3CD /* PersonViewController.m */; };
 		2A23FF97199DD997009BA3CD /* DataConnect.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A23FF95199DD997009BA3CD /* DataConnect.m */; };
+		2A23FF9A199F3993009BA3CD /* EditProfileTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A23FF99199F3993009BA3CD /* EditProfileTableViewController.m */; };
 		2A7A7E9E19814357004869D1 /* BSSellerAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7A7E9B19814357004869D1 /* BSSellerAPIClient.m */; };
 		2A7A7E9F19814357004869D1 /* BSUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7A7E9D19814357004869D1 /* BSUserManager.m */; };
 		2A91678B199D245D00C61D48 /* NameTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A91678A199D245D00C61D48 /* NameTableView.m */; };
@@ -124,6 +125,8 @@
 		2A23FF93199DB0BF009BA3CD /* PersonViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PersonViewController.m; path = JSQMessagesDemo/PersonViewController.m; sourceTree = SOURCE_ROOT; };
 		2A23FF95199DD997009BA3CD /* DataConnect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataConnect.m; sourceTree = SOURCE_ROOT; };
 		2A23FF96199DD997009BA3CD /* DataConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataConnect.h; sourceTree = SOURCE_ROOT; };
+		2A23FF98199F3993009BA3CD /* EditProfileTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EditProfileTableViewController.h; path = JSQMessagesDemo/EditProfileTableViewController.h; sourceTree = SOURCE_ROOT; };
+		2A23FF99199F3993009BA3CD /* EditProfileTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EditProfileTableViewController.m; path = JSQMessagesDemo/EditProfileTableViewController.m; sourceTree = SOURCE_ROOT; };
 		2A7A7E9A19814357004869D1 /* BSSellerAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSSellerAPIClient.h; sourceTree = SOURCE_ROOT; };
 		2A7A7E9B19814357004869D1 /* BSSellerAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BSSellerAPIClient.m; sourceTree = SOURCE_ROOT; };
 		2A7A7E9C19814357004869D1 /* BSUserManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSUserManager.h; sourceTree = SOURCE_ROOT; };
@@ -532,6 +535,8 @@
 				2A23FF93199DB0BF009BA3CD /* PersonViewController.m */,
 				885D596718CBD2A600D77BB3 /* JSQTableViewController.h */,
 				885D596818CBD2A600D77BB3 /* JSQTableViewController.m */,
+				2A23FF98199F3993009BA3CD /* EditProfileTableViewController.h */,
+				2A23FF99199F3993009BA3CD /* EditProfileTableViewController.m */,
 				885D596C18CBD2BF00D77BB3 /* Main.storyboard */,
 				885D593318CBD13D00D77BB3 /* Supporting Files */,
 			);
@@ -863,6 +868,7 @@
 				8816A6B618E9250400111919 /* JSQMessagesLabel.m in Sources */,
 				88ADC6FC18F0999000FE0266 /* JSQMessagesKeyboardController.m in Sources */,
 				8816A6B418E9250400111919 /* JSQMessagesComposerTextView.m in Sources */,
+				2A23FF9A199F3993009BA3CD /* EditProfileTableViewController.m in Sources */,
 				2AB814B11981485600A8A499 /* BSDefaultViewObject.m in Sources */,
 				8816A6AA18E9250400111919 /* JSQMessagesToolbarButtonFactory.m in Sources */,
 				8816A6A418E9250400111919 /* UIView+JSQMessages.m in Sources */,

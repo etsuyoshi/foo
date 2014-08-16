@@ -43,4 +43,11 @@
                   completion:(void (^)(NSDictionary *,
                                        NSURLSessionDataTask *,
                                        NSError *))block;
+
+-(void)updateUsersWithDeviceKey:(NSString *)deviceKey
+                      accountId:(NSString *)accountId
+                           name:(NSString *)name
+                     completion:(void (^)(NSDictionary *,
+                                          NSURLSessionDataTask *,
+                                          NSError *))block;
 @end

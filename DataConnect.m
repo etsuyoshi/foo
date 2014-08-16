@@ -164,6 +164,51 @@
     
 }
 
-
+-(void)updateUsersWithDeviceKey:(NSString *)deviceKey
+                      accountId:(NSString *)accountId
+                           name:(NSString *)name
+                     completion:(void (^)(NSDictionary *,
+                                          NSURLSessionDataTask *,
+                                          NSError *))block{
+    NSMutableDictionary *parameters =
+    [NSMutableDictionary dictionary];
+    
+    if(deviceKey){
+        parameters[@"device_key"] = deviceKey;
+    }else{
+        NSLog(@"devicekey null");
+    }
+    
+    if(!(name      == nil || [name isEqual:[NSNull null]]) ||
+       !(accountId == nil || [accountId isEqual:[NSNull null]])
+       ){
+        if(name){
+            parameters[@"name"] = name;
+        }
+        
+        if(accountId){
+            parameters[@"account_id"] = accountId;
+        }
+    }else{
+        NSLog(@"null error");
+        return;
+    }
+    
+    
+    
+    [self POST:@"/users/update"
+    parameters:parameters
+       success:^(NSURLSessionDataTask *task,
+                 id responseObject){
+           NSLog(@"success");
+           if(block)block(responseObject, task, nil);
+       }
+       failure:^(NSURLSessionDataTask *task,
+                 NSError *error){
+           NSLog(@"failure");
+           if(block)block(nil, task, error);
+       }];
+    
+}
 
 @end
