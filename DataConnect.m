@@ -126,4 +126,44 @@
     
 }
 
+//POST /users/find
+-(void)findUserWithDeviceKey:(NSString *)deviceKey
+           accountId:(NSString *)accountId
+        completion:(void (^)(NSDictionary *,
+                             NSURLSessionDataTask *,
+                             NSError *))block{
+    NSMutableDictionary *parameters =
+    [NSMutableDictionary dictionary];
+    
+    if(deviceKey){
+        parameters[@"device_key"] = deviceKey;
+    }else{
+        NSLog(@"device_key null");
+        return;
+    }
+    if(accountId){
+        parameters[@"account_id"] = accountId;
+    }else{
+        NSLog(@"account_id null");
+        return;
+    }
+    
+    [self POST:@"/users/find"
+    parameters:parameters
+       success:^(NSURLSessionDataTask *task,
+                 id responseObject){
+           NSLog(@"success");
+           if(block)block(responseObject, task, nil);
+       }
+       failure:^(NSURLSessionDataTask *task,
+                 NSError *error){
+           NSLog(@"failure");
+           if(block)block(nil, task, error);
+       }];
+    
+    
+}
+
+
+
 @end

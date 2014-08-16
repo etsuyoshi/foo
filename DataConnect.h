@@ -38,4 +38,9 @@
                              NSURLSessionDataTask *,
                              NSError *))block;
 
+-(void)findUserWithDeviceKey:(NSString *)deviceKey
+                   accountId:(NSString *)accountId
+                  completion:(void (^)(NSDictionary *,
+                                       NSURLSessionDataTask *,
+                                       NSError *))block;
 @end
