@@ -246,14 +246,14 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     
     NSLog(@"add table");
     
-    //panすると左からスライドするメニュー
-    tableView =
-    [[NameTableView alloc]initWithFrame:
-     CGRectMake(0, 0, self.view.bounds.size.width*3/4, self.view.bounds.size.height)];
-    [tableView.menuView reloadData];
-    [self.view addSubview:tableView];
-    
-    //ジェスチャーをつけるのはself.viewにしてpannedメソッドの中で動かすものだけtableViewにする
+//    //panすると左からスライドするメニュー
+//    tableView =
+//    [[NameTableView alloc]initWithFrame:
+//     CGRectMake(0, 0, self.view.bounds.size.width*3/4, self.view.bounds.size.height)];
+//    [tableView.menuView reloadData];
+//    [self.view addSubview:tableView];
+//    
+//    //ジェスチャーをつけるのはself.viewにしてpannedメソッドの中で動かすものだけtableViewにする
     //panGesture or - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
     UIPanGestureRecognizer *panGesture =
     [[UIPanGestureRecognizer alloc]
@@ -267,6 +267,13 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 -(void)panned:(UIPanGestureRecognizer *)sender{
     NSLog(@"panned %@", [(UIPanGestureRecognizer *)sender view]);
     
+    
+    
+    
+    
+    return;
+    
+    //以下テーブルを動かす(今回は必要ない)
 //    [self.view bringSubviewToFront:[(UIPanGestureRecognizer*)sender view]];
     [self.view bringSubviewToFront:tableView];//[(UIPanGestureRecognizer *)sender view]];
 //    CGPoint translatedPoint = [(UIPanGestureRecognizer*)sender translationInView:self.view];

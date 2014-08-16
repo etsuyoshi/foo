@@ -20,6 +20,7 @@
 
 @implementation JSQTableViewController{
     NSArray *arrPhrase;
+    NSArray *arrId;
     
     UITextField *textField;
     UIView *viewUnderKeyboard;
@@ -30,7 +31,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.title = @"あいことば";
+    self.title = @"チャット";
     
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
@@ -41,6 +42,10 @@
     self.navigationItem.rightBarButtonItem = backButton;
     
     arrPhrase = [NSArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
+    arrId = [NSArray arrayWithObjects:@"taro", @"jiro", nil];
+    
+    
+    
     
     //cellが反応しない
 //    UITapGestureRecognizer *gestureRecognizer =
@@ -98,22 +103,34 @@
     [viewUnderKeyboard addSubview:textField];
     
     // ボタンを配置するUIViewを作成
-    UIView* accessoryView = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,44)];
+    UIView* accessoryView = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,39)];
     accessoryView.backgroundColor = [UIColor whiteColor];
     
-    // ボタンを作成
-    UIButton* closeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    closeButton.frame = CGRectMake(210,5,100,30);
-    [closeButton setTitle:@"決定" forState:UIControlStateNormal];
     
-    // ボタンを押したときに呼ばれる動作を設定
-    [closeButton
+    
+    //キャンセルボタン
+    UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    cancelButton.frame = CGRectMake(5, 5, 100, 30);
+    [cancelButton setTitle:@"キャンセル" forState:UIControlStateNormal];
+    [cancelButton// ボタンを押したときに呼ばれる動作を設定
+     addTarget:self
+     action:@selector(dismissKeyBoard)
+     forControlEvents:UIControlEventTouchUpInside];
+    [accessoryView addSubview:cancelButton];
+    
+    
+    
+    // 決定ボタンを作成
+    UIButton* decideButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    decideButton.frame = CGRectMake(250,5,100,30);
+    [decideButton setTitle:@"決定" forState:UIControlStateNormal];
+    [decideButton// ボタンを押したときに呼ばれる動作を設定
      addTarget:self
      action:@selector(determine)
      forControlEvents:UIControlEventTouchUpInside];
     
     // ボタンをViewに追加
-    [accessoryView addSubview:closeButton];
+    [accessoryView addSubview:decideButton];
     
     // ビューをUITextFieldのinputAccessoryViewに設定
     textField.inputAccessoryView = accessoryView;
@@ -135,10 +152,30 @@
 //決定ボタンを押したとき
 -(void)determine{
     NSLog(@"determine : text = %@", textField.text);
-    [self dismissKeyBoard];
+
     
-    //合い言葉があってればtableViewの行を一つ増やす
     
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+    NSString *strDeviceKey = store[@"device_key"];
+    //idが存在していればtableViewの行を一つ増やす
+    [[DataConnect sharedClient]
+     findUserWithDeviceKey:strDeviceKey
+     accountId:textField.text
+     completion:^(NSDictionary *userInfo,
+                  NSURLSessionDataTask *task,
+                  NSError *error){
+         NSLog(@"userinfo = %@", userInfo);
+         if(userInfo == nil || [userInfo isEqual:[NSNull null]]){
+             
+         }else if([userInfo[@"succeed"] isEqualToString:@"1"]){
+             
+         }else if([userInfo[@"succeed"] isEqualToString:@"0"]){
+             
+         }
+     }];
+     
+     [self dismissKeyBoard];
+     store = nil;
 }
 
 //キーボードを消すのみ
@@ -154,12 +191,24 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 1;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return arrPhrase.count;
+    if(section == 0){
+        return arrPhrase.count;
+    }else{
+        return  arrId.count;
+    }
+}
+
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    if(section == 0){
+        return @"あいことば";
+    }else{
+        return @"id";
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -170,9 +219,12 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
-    
-    if (indexPath.section == 0) {
+    if(indexPath.section == 0){
         cell.textLabel.text = arrPhrase[indexPath.row];//合い言葉
+    }else{
+        cell.textLabel.text = arrId[indexPath.row];//ID
+    }
+//    if (indexPath.section == 0) {
 //        switch (indexPath.row) {
 //            case 0:
 //                cell.textLabel.text = @"Push via storyboard";
@@ -191,7 +243,7 @@
 //                cell.textLabel.text = @"Modal programmatically";
 //                break;
 //        }
-    }
+//    }
     
     return cell;
 }
