@@ -19,8 +19,8 @@
 #import "JSQTableViewController.h"
 
 @implementation JSQTableViewController{
-    NSArray *arrPhrase;
-    NSArray *arrId;
+    NSMutableArray *arrPhrase;
+    NSMutableArray *arrId;
     
     UITextField *textField;
     UIView *viewUnderKeyboard;
@@ -34,15 +34,17 @@
     self.title = @"チャット";
     
     
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
+    
+    
+    UIBarButtonItem *addButton = [[UIBarButtonItem alloc]
                                    initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                    target:self
                                    action:@selector(add)];
     // Here I think you wanna add the searchButton and not the filterButton..
-    self.navigationItem.rightBarButtonItem = backButton;
+    self.navigationItem.rightBarButtonItem = addButton;
     
-    arrPhrase = [NSArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
-    arrId = [NSArray arrayWithObjects:@"taro", @"jiro", nil];
+    arrPhrase = [NSMutableArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
+    arrId = [NSMutableArray arrayWithObjects:@"taro", @"jiro", nil];
     
     
     
@@ -165,17 +167,39 @@
                   NSURLSessionDataTask *task,
                   NSError *error){
          NSLog(@"userinfo = %@", userInfo);
+         NSLog(@"succeed = %@ : %@", userInfo[@"succeed"], [userInfo[@"succeed"] class]);
          if(userInfo == nil || [userInfo isEqual:[NSNull null]]){
+             [self dispError:1];
+         }else if([userInfo[@"succeed"] intValue] == 1){
+             //id検索に成功した場合
              
-         }else if([userInfo[@"succeed"] isEqualToString:@"1"]){
+             if(![arrId containsObject:userInfo[@"user"][@"account_id"]]){
+                 [arrId addObject:userInfo[@"user"][@"account_id"]];
+                 [self.tableView reloadData];
+                 
+                 [SVProgressHUD showSuccessWithStatus:@"追加しました!"];
+             }else{
+                 [SVProgressHUD showSuccessWithStatus:@"既に追加されています!"];
+             }
              
-         }else if([userInfo[@"succeed"] isEqualToString:@"0"]){
-             
+         }else if([userInfo[@"succeed"] intValue] == 0){
+             [self dispError:0];
          }
      }];
      
      [self dismissKeyBoard];
      store = nil;
+}
+
+-(void)dispError:(int)errorCode{
+    if(errorCode == 0){
+        [SVProgressHUD showSuccessWithStatus:
+         [NSString stringWithFormat:@"ユーザーが見つかりません。\nerrorcode=%d", errorCode]];
+    }else if(errorCode == 1){
+        [SVProgressHUD showSuccessWithStatus:
+         [NSString stringWithFormat:@"検索に失敗しました。\nerrorcode=%d", errorCode]];
+    }
+
 }
 
 //キーボードを消すのみ
