@@ -260,14 +260,25 @@
 -(void)saveInfo{
     NSLog(@"saveinfo");
     
+    [self.view endEditing:YES];
+    
+    NSLog(@"tfName=%@, keychain=%@",
+          tfName.text,
+          [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"]);
     //既に保存されているものと同じかどうか判定もしくはnull
-    if(tfName == nil || [tfName isEqual:[NSNull null]] ||
+    if(tfName.text == nil || [tfName.text isEqual:[NSNull null]] ||
+       [tfName.text isEqualToString:@""] ||
        [tfName.text isEqualToString:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"]]){
         [self dispError:@"既に保存されているアカウント名と同じです"];
         return;
     }
     
-    if(tfAccountId == nil || [tfAccountId isEqual:[NSNull null]] ||
+    
+    NSLog(@"tfAccountId=%@, keychain=%@",
+          tfAccountId.text,
+          [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"]);
+    if(tfAccountId.text == nil || [tfAccountId.text isEqual:[NSNull null]] ||
+       [tfAccountId.text isEqualToString:@""] ||
        [tfAccountId.text isEqualToString:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"]]){
         [self dispError:@"既に保存されているアカウントIDと同じです"];
         return;
@@ -284,9 +295,27 @@
             NSLog(@"save error : null");
             return ;
         }else if([userInfo[@"succeed"] intValue] == 1){
-            NSLog(@"succeed");
+            NSLog(@"succeed userinfo=%@",userInfo);
             
             
+            UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+//            [[UICKeyChainStore keyChainStoreWithService:@"ichat"]
+            [store
+             setString:userInfo[@"user"][@"account_id"]
+             forKey:@"account_id"];
+            
+//            [[UICKeyChainStore keyChainStoreWithService:@"ichat"]
+            [store
+             setString:userInfo[@"user"][@"name"]
+             forKey:@"name"];
+            
+            
+//            [SVProgressHUD showSuccessWithStatus:userInfo[@"user"]];
+            
+            
+            
+            //なぜか反映されていない！！！！！！！！！！！！！！！！！！！！！！！
+            NSLog(@"complete = %@" , [UICKeyChainStore keyChainStoreWithService:@"ichat"]);
             return;
         }else if([userInfo[@"succeed"] intValue] == 0){
             
@@ -298,6 +327,13 @@
         
      }];
 }
+
+/*
+ [store setString:userInfo[@"user"][@"account_id"]
+ forKey:@"account_id"];
+ [store setString:userInfo[@"user"][@"name"]
+ forKey:@"name"];
+ */
 
 -(void)dispError:(NSString *) errorContents{
     NSLog(@"disperror");
@@ -311,7 +347,7 @@
         [tfAccountId becomeFirstResponder];
     }else if(((UITextField *)sender).tag == 1){
         //全てのキーボードを非表示にする
-        [self.view endEditing:YES];//効かない？
+//        [self.view endEditing:YES];//効かない？
     }
 }
 
