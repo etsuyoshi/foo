@@ -26,6 +26,8 @@
     
     UITextField *textField;
     UIView *viewUnderKeyboard;
+    
+    BOOL isConnectMode;
 }
 
 @synthesize timer;
@@ -35,6 +37,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    isConnectMode = true;
     
     [[BSUserManager sharedManager]
      autoSignInWithBlock:^(NSError *error){
@@ -112,6 +116,39 @@
 -(void)checkMessage:(NSTimer *)timer{
     NSLog(@"aaa");
     
+    
+    //通信可能状態＝データ通信中ではない
+    if(isConnectMode){
+        
+        isConnectMode = false;
+        
+        UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+        NSString *strDeviceKey = store[@"device_key"];
+        
+        
+        [[DataConnect sharedClient]
+        receiveMessageToDeviceKey:strDeviceKey
+        timeLineId:nil
+        completion:^(NSDictionary *userInfo,
+                     NSURLSessionDataTask *task,
+                     NSError *error){
+            //データ通信中なので通信可能状態に設定
+            isConnectMode = YES;
+            
+            
+            //メッセージの有無を判定
+            
+            
+            //メッセージがあれば内容をデバイスに一時的に保存してタイムラインに移動
+            NSLog(@"receivemessage = %@", userInfo);
+                  
+                  
+            //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
+            
+            
+            
+        }];
+    }
     
 }
 

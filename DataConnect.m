@@ -230,7 +230,7 @@
 
 //+(void)createTimeLine
 
-+(void)receiveMessageToDeviceKey:(NSString *)deviceKey
+-(void)receiveMessageToDeviceKey:(NSString *)deviceKey
                       timeLineId:(NSString *)timeLineId
                       completion:(void (^)(NSDictionary *,
                                            NSURLSessionDataTask *,
@@ -243,6 +243,12 @@
     }else{
         NSLog(@"devicekey null");
         return;
+    }
+    
+    if(timeLineId) {
+        parameters[@"time_line_id"] = timeLineId;
+    }else{
+        //do nothing
     }
     
     
@@ -259,7 +265,8 @@
            NSLog(@"failure");
            if(block)block(nil, task, error);
        }];
-    
-    
 }
+
+
+
 @end
