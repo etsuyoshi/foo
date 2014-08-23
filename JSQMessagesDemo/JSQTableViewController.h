@@ -23,7 +23,6 @@
 @interface JSQTableViewController : UITableViewController <JSQDemoViewControllerDelegate>
 
 @property (nonatomic, weak) NSTimer *timer;
-@property (nonatomic, weak) NSString *timeLineId;
 
 - (IBAction)unwindSegue:(UIStoryboardSegue *)sender;
 

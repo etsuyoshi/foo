@@ -33,7 +33,6 @@
 }
 
 @synthesize timer;
-@synthesize timeLineId;
 
 #pragma mark - View lifecycle
 
@@ -132,13 +131,33 @@
         
         [[DataConnect sharedClient]
         receiveMessageToDeviceKey:strDeviceKey
-        timeLineId:self.timeLineId
+        timeLineId:nil
         completion:^(NSDictionary *userInfo,
                      NSURLSessionDataTask *task,
                      NSError *error){
             //データ通信中なので通信可能状態に設定
             isConnectMode = YES;
             
+            NSLog(@"succeed = %d", [userInfo[@"succeed"] integerValue]);
+            NSLog(@"message = %@", userInfo[@"messages"]);
+            
+            if([userInfo[@"succeed"] integerValue] == 1){
+                NSLog(@"通信成功");
+            }
+            
+            if(userInfo[@"messages"] == nil ||
+               [userInfo[@"messages"] isEqual:[NSNull null]]){
+                NSLog(@"メッセージがnullです。");
+            }
+            
+            int numOfMessages = ((NSArray *)userInfo[@"messages"]).count;
+            if(numOfMessages == 0){
+                NSLog(@"メッセージの個数がゼロ");
+            }else{
+                for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
+                    
+                }
+            }
             
             //メッセージの有無を判定
             
