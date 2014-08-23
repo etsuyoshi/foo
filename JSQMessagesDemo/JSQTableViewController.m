@@ -28,9 +28,12 @@
     UIView *viewUnderKeyboard;
     
     BOOL isConnectMode;
+    
+    
 }
 
 @synthesize timer;
+@synthesize timeLineId;
 
 #pragma mark - View lifecycle
 
@@ -38,7 +41,7 @@
 {
     [super viewDidLoad];
     
-    isConnectMode = true;
+    isConnectMode = YES;
     
     [[BSUserManager sharedManager]
      autoSignInWithBlock:^(NSError *error){
@@ -114,13 +117,14 @@
 }
 
 -(void)checkMessage:(NSTimer *)timer{
-    NSLog(@"aaa");
+    NSLog(@"checkMessage");
     
     
-    //通信可能状態＝データ通信中ではない
+    //通信可能状態(＝データ通信中ではない)の時のみreceiveMessageを実行
     if(isConnectMode){
         
-        isConnectMode = false;
+        //通信中に設定するので今回の通信が完了しない限り、次回の通信は行わない
+        isConnectMode = NO;
         
         UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
         NSString *strDeviceKey = store[@"device_key"];
@@ -128,7 +132,7 @@
         
         [[DataConnect sharedClient]
         receiveMessageToDeviceKey:strDeviceKey
-        timeLineId:nil
+        timeLineId:self.timeLineId
         completion:^(NSDictionary *userInfo,
                      NSURLSessionDataTask *task,
                      NSError *error){
