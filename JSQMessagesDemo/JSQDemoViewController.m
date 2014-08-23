@@ -31,11 +31,16 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 
 
 @implementation JSQDemoViewController{
+    
+    
     float firstX;
     float firstY;
     
     NameTableView *tableView;
 }
+
+@synthesize strTimeLineId;
+@synthesize timerConversation;
 
 #pragma mark - Demo setup
 
@@ -133,60 +138,20 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     
     self.sender = @"Jesse Squires";
     
-    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+//    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+//    
+//    NSString *strDeviceKey = store[@"device_key"];
+//    NSLog(@"strDeviceKey = %@", strDeviceKey);
     
-    NSString *strDeviceKey = store[@"device_key"];
-    NSLog(@"strDeviceKey = %@", strDeviceKey);
-    
-    if([strDeviceKey isEqual:[NSNull null]] ||
-       strDeviceKey == nil){
-        
-        [SVProgressHUD
-         showWithStatus:@"アカウント取得中..."
-         maskType:SVProgressHUDMaskTypeGradient];
-        
-        [[DataConnect sharedClient]
-         createUserCompletion:^(NSDictionary *userInfo,
-                      NSURLSessionDataTask *task,
-                      NSError *error){
+    [[BSUserManager sharedManager]
+     autoSignInWithBlock:^(NSError *error){
+         if(error != nil &&
+            [error isEqual:[NSNull null]]){
              
              
-             
-             NSLog(@"userinfo = %@", userInfo);
-             
-             if([userInfo[@"succeed"] integerValue] == 1){
-                 
-                 NSLog(@"アカウント発行：jsonData ... %@",
-                       userInfo);
-                 
-                 [store setString:userInfo[@"user"][@"account_id"]
-                           forKey:@"account_id"];
-                 [store setString:userInfo[@"user"][@"name"]
-                           forKey:@"name"];
-                 [store setString:userInfo[@"user"][@"device_key"]
-                           forKey:@"device_key"];
-                 
-                 NSLog(@"設定後: account_id=%@, name=%@, devicekey = %@",
-                       store[@"account_id"],
-                       store[@"name"],
-                       store[@"device_key"]);
-                 [store synchronize];
-                 
-                 [SVProgressHUD showSuccessWithStatus:@"受信完了！"];
-                 
-                 //                 NSLog(@"格納後 = %@", )
-             }else{
-                 NSLog(@"read data failure");
-                 [SVProgressHUD showSuccessWithStatus:@"受信失敗！"];
-             }
-         }];
-    }else{//デバイスキーがそもそも存在すれば
-        [SVProgressHUD showSuccessWithStatus:@"アカウントを確認しました!"];
-    }
-
-    
-    
-    
+             NSLog(@"errorが発生しました!");
+         }
+     }];
     
     //navigationBarのアイテムの編集
 //    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(10, 10, 100, 70)];
@@ -260,6 +225,12 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
      initWithTarget:self action:@selector(panned:)];//動かす対
     [self.view addGestureRecognizer:panGesture];//タッチする対象？
 }
+
+-(void)checkMessage:(NSTimer *)timer{
+    NSLog(@"bbb");
+    
+}
+
 -(void)back{
     NSLog(@"back");
     [self.navigationController popViewControllerAnimated:YES];
@@ -369,6 +340,17 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
+    
+    
+    timerConversation = [NSTimer
+             scheduledTimerWithTimeInterval:5
+             target:self
+             selector:@selector(checkMessage:)
+             userInfo:nil
+             repeats:YES];
+    
+    
     
     /**
      *  Enable/disable springy bubbles, default is NO.

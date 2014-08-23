@@ -22,6 +22,8 @@
 
 @interface JSQTableViewController : UITableViewController <JSQDemoViewControllerDelegate>
 
+@property (nonatomic, weak) NSTimer *timer;
+
 - (IBAction)unwindSegue:(UIStoryboardSegue *)sender;
 
 @end

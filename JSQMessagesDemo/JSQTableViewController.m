@@ -20,20 +20,52 @@
 #import "EditProfileTableViewController.h"
 
 @implementation JSQTableViewController{
-    NSMutableArray *arrPhrase;
-    NSMutableArray *arrId;
+    NSMutableArray *arrGroupId;
+    NSMutableArray *arrIndivisualId;
+    NSMutableDictionary *dictNameToId;
     
     UITextField *textField;
     UIView *viewUnderKeyboard;
 }
+
+@synthesize timer;
 
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.title = @"チャット";
     
+    [[BSUserManager sharedManager]
+     autoSignInWithBlock:^(NSError *error){
+         if(error != nil &&
+            [error isEqual:[NSNull null]]){
+             
+             NSLog(@"jsqTableViewControllerでaccount=%@",
+                   [UICKeyChainStore keyChainStoreWithService:@"ichat"]);
+             
+             NSLog(@"正常に起動しました");
+         }else{
+             NSLog(@"at jsqTableView didload: error = %@", error);
+         }
+     }];
+    
+    
+    
+    timer = [NSTimer
+             scheduledTimerWithTimeInterval:1
+             target:self
+             selector:@selector(checkMessage:)
+             userInfo:nil
+             repeats:YES];
+    
+    NSLog(@"timer validate");
+    
+    
+    
+    
+    self.title = @"チャット";
+    NSLog(@"viewdidload at jsqTableView");
     
     
     UIBarButtonItem *editButton =
@@ -50,8 +82,14 @@
     // Here I think you wanna add the searchButton and not the filterButton..
     self.navigationItem.rightBarButtonItem = addButton;
     
-    arrPhrase = [NSMutableArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
-    arrId = [NSMutableArray arrayWithObjects:@"taro", @"jiro", nil];
+    
+    
+    //最終的にはtime_line_idからサーバー経由で合い言葉、chat相手のidを取得
+    arrGroupId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
+//    arrIndivisualId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"taro", @"jiro", nil];
+    arrIndivisualId = [NSMutableArray array];
+    
+    dictNameToId = nil;
     
     
     
@@ -71,12 +109,19 @@
     [self.tableView reloadData];
 }
 
+-(void)checkMessage:(NSTimer *)timer{
+    NSLog(@"aaa");
+    
+    
+}
+
 //-(void)closeSoftKeyboard{
 //    [self.view endEditing:YES];
 //}
 
 -(void)edit{
     NSLog(@"編集中...");
+    [timer invalidate];
     EditProfileTableViewController *vc = [[EditProfileTableViewController alloc]init];
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -141,7 +186,7 @@
     [decideButton setTitle:@"決定" forState:UIControlStateNormal];
     [decideButton// ボタンを押したときに呼ばれる動作を設定
      addTarget:self
-     action:@selector(determine)
+     action:@selector(determineAdd)
      forControlEvents:UIControlEventTouchUpInside];
     
     // ボタンをViewに追加
@@ -165,9 +210,8 @@
 }
 
 //決定ボタンを押したとき
--(void)determine{
+-(void)determineAdd{
     NSLog(@"determine : text = %@", textField.text);
-
     
     
     UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
@@ -186,8 +230,8 @@
          }else if([userInfo[@"succeed"] intValue] == 1){
              //id検索に成功した場合
              
-             if(![arrId containsObject:userInfo[@"user"][@"account_id"]]){
-                 [arrId addObject:userInfo[@"user"][@"account_id"]];
+             if(![arrIndivisualId containsObject:userInfo[@"user"][@"account_id"]]){
+                 [arrIndivisualId addObject:userInfo[@"user"][@"account_id"]];
                  [self.tableView reloadData];
                  
                  [SVProgressHUD showSuccessWithStatus:@"追加しました!"];
@@ -234,9 +278,9 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if(section == 0){
-        return arrPhrase.count;
+        return arrGroupId.count;
     }else{
-        return  arrId.count;
+        return  arrIndivisualId.count;
     }
 }
 
@@ -257,9 +301,9 @@
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     if(indexPath.section == 0){
-        cell.textLabel.text = arrPhrase[indexPath.row];//合い言葉
+        cell.textLabel.text = arrGroupId[indexPath.row];//合い言葉
     }else{
-        cell.textLabel.text = arrId[indexPath.row];//ID
+        cell.textLabel.text = arrIndivisualId[indexPath.row];//ID
     }
 //    if (indexPath.section == 0) {
 //        switch (indexPath.row) {
@@ -325,9 +369,21 @@
 //        }
         
         
+        //タイマーを無効にする
+        [timer invalidate];
+        
         JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
         [self.navigationController pushViewController:vc animated:YES];
         
+    }
+    
+    if(indexPath.section == 1){
+        
+        
+        
+        JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
+        vc.strTimeLineId = @"";
+        [self.navigationController pushViewController:vc animated:YES];
     }
 }
 

@@ -25,10 +25,25 @@
 
 - (void)viewDidLoad
 {
+    [[BSUserManager sharedManager]
+     autoSignInWithBlock:^(NSError *error){
+         if(error != nil &&
+            [error isEqual:[NSNull null]]){
+             
+             
+             NSLog(@"errorが発生しました!");
+         }
+     }];
+    
+    
+    
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    
+    
 }
 
 - (void)didReceiveMemoryWarning

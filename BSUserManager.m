@@ -31,49 +31,62 @@
 }
 
 
-//初期起動時のユーザー認証:メアドとパスワードでやってる。。
+//初期起動時のユーザー認証:
 - (void)autoSignInWithBlock:(void (^)(NSError *error))block
 {
     
-    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"in.thebase"];
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+    NSString *strDeviceKey = store[@"device_key"];
+    if([strDeviceKey isEqual:[NSNull null]] ||
+       strDeviceKey == nil){
+        
+        NSLog(@"account acquiring");
+        
+        [SVProgressHUD
+         showWithStatus:@"アカウント取得中..."
+         maskType:SVProgressHUDMaskTypeGradient];
+        
+        [[DataConnect sharedClient]
+         createUserCompletion:^(NSDictionary *userInfo,
+                                NSURLSessionDataTask *task,
+                                NSError *error){
+             
+             
+             
+             NSLog(@"userinfo = %@", userInfo);
+             
+             if([userInfo[@"succeed"] integerValue] == 1){
+                 
+                 NSLog(@"アカウント発行：jsonData ... %@",
+                       userInfo);
+                 
+                 [store setString:userInfo[@"user"][@"account_id"]
+                           forKey:@"account_id"];
+                 [store setString:userInfo[@"user"][@"name"]
+                           forKey:@"name"];
+                 [store setString:userInfo[@"user"][@"device_key"]
+                           forKey:@"device_key"];
+                 
+                 NSLog(@"設定後: account_id=%@, name=%@, devicekey = %@",
+                       store[@"account_id"],
+                       store[@"name"],
+                       store[@"device_key"]);
+                 [store synchronize];
+                 
+                 [SVProgressHUD showSuccessWithStatus:@"新規アカウント取得完了！"];
+                 
+                 //                 NSLog(@"格納後 = %@", )
+             }else{
+                 NSLog(@"read data failure");
+                 [SVProgressHUD showSuccessWithStatus:@"受信失敗！"];
+             }
+         }];
+    }else{//デバイスキーがそもそも存在すれば
+        NSLog(@"アカウントを確認しました!");
+        [SVProgressHUD showSuccessWithStatus:
+         [NSString stringWithFormat:@"ようこそ、%@さん", store[@"name"]]];
+    }
     
-    NSLog(@"[store stringForKeyEm:%@",[store stringForKey:@"email"]);
-    NSLog(@"[store stringForKeyPs%@",[store stringForKey:@"password"]);
-    NSString *email = [store stringForKey:@"email"];
-    NSString *password = [store stringForKey:@"password"];
-    
-    NSLog(@"autoSignInWithBlock");
-
-    [[BSSellerAPIClient sharedClient] postUsersSignInWithMailAddress:email password:password completion:^(NSDictionary *results, NSError *error) {
-       
-        NSLog(@"postUsersSignInWithMailAddress");
-        if (error) {
-            if (block) block(error);
-        } else{
-            NSLog(@"results = %@", results);
-            NSDictionary *result = results[@"result"];
-            NSDictionary *Auth = result[@"Auth"];
-            NSLog(@"session_id:%@",Auth[@"session_id"]);
-            NSString *session = Auth[@"session_id"];
-            NSString *shopId = [results valueForKeyPath:@"result.User.shop_id"];
-            
-            _shopId = shopId;
-            _sessionId = session;
-            if (!Auth[@"session_id"]){
-                [SVProgressHUD showErrorWithStatus:@"パスワードかメールアドレスが正しくありません"];
-                [store removeItemForKey:@"email"];
-                [store removeItemForKey:@"password"];
-                [store synchronize];
-                
-            } else {
-                
-                //[SVProgressHUD showSuccessWithStatus:@"ログイン完了！"];
-            }
-            
-            if (block) block(nil);
-
-        }
-    }];
 }
 
 @end
