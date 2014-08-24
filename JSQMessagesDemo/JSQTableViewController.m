@@ -241,6 +241,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 //メニューの右ボタン；追加ボタン
 -(void)addId{
     
+    //case1
     //アラートメッセージで入力させる場合(開始)
     NSLog(@"add id");
     UIAlertView *alertView =
@@ -257,7 +258,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     //アラートメッセージ入力(終了)
     
     
-    
+    //case2
     //カスタム入力フォーム
     
     //念のため(表示されている場合のために)一旦隠す
