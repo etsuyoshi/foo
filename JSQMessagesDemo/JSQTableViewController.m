@@ -24,7 +24,7 @@
     NSMutableArray *arrIndivisualId;
     NSMutableDictionary *dictNameToId;
     
-    UITextField *textField;
+    UITextView *textView;
     UIView *viewUnderKeyboard;
     
     BOOL isConnectMode;
@@ -38,6 +38,8 @@
 
 - (void)viewDidLoad
 {
+    
+    
     [super viewDidLoad];
     
     isConnectMode = YES;
@@ -188,10 +190,10 @@
 //
 -(void)addId{
 //    //keyboardを立ち上げる
-//    UITextField *textField = [[UITextField alloc]init];
-//    [self.view addSubview:textField];
+//    UITextView *textView = [[UITextView alloc]init];
+//    [self.view addSubview:textView];
 //    // キーボードを出す
-//    [textField becomeFirstResponder];
+//    [textView becomeFirstResponder];
     
     //念のため一旦隠す
     [self dismissKeyBoard];
@@ -219,19 +221,24 @@
     
     
     //
-    textField = [[UITextField alloc]init];
-    [viewUnderKeyboard addSubview:textField];
+    textView = [[UITextView alloc]init];
+    [viewUnderKeyboard addSubview:textView];
     
     // ボタンを配置するUIViewを作成
     UIView* accessoryView = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,39)];
     accessoryView.backgroundColor = [UIColor whiteColor];
     
+//    textView.frame = CGRectMake(150, 0, 100, 50);
+//    [accessoryView addSubview:textView];
+    
+    //新規にテキストフィールドを作成してaccessoryViewに貼付ける
     
     
     //キャンセルボタン
     UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    cancelButton.frame = CGRectMake(5, 5, 100, 30);
+    cancelButton.frame = CGRectMake(0, 5, 100, 30);
     [cancelButton setTitle:@"キャンセル" forState:UIControlStateNormal];
+    cancelButton.titleLabel.textAlignment = NSTextAlignmentLeft;
     [cancelButton// ボタンを押したときに呼ばれる動作を設定
      addTarget:self
      action:@selector(dismissKeyBoard)
@@ -252,10 +259,10 @@
     // ボタンをViewに追加
     [accessoryView addSubview:decideButton];
     
-    // ビューをUITextFieldのinputAccessoryViewに設定
-    textField.inputAccessoryView = accessoryView;
+    // ビューをUITextViewのinputAccessoryViewに設定
+    textView.inputAccessoryView = accessoryView;
     
-    [textField becomeFirstResponder];
+    [textView becomeFirstResponder];
     
     [UIView
      animateWithDuration:0.8f
@@ -271,7 +278,7 @@
 
 //決定ボタンを押したとき
 -(void)determineAdd{
-    NSLog(@"determine : text = %@", textField.text);
+    NSLog(@"determine : text = %@", textView.text);
     
     
     UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
@@ -279,7 +286,7 @@
     //idが存在していればtableViewの行を一つ増やす
     [[DataConnect sharedClient]
      findUserWithDeviceKey:strDeviceKey
-     accountId:textField.text
+     accountId:textView.text
      completion:^(NSDictionary *userInfo,
                   NSURLSessionDataTask *task,
                   NSError *error){
@@ -322,7 +329,7 @@
 //キーボードを消すのみ
 -(void)dismissKeyBoard{
     NSLog(@"dismissKeyboard");
-    textField = nil;
+    textView = nil;
     [viewUnderKeyboard removeFromSuperview];
     viewUnderKeyboard = nil;
 
@@ -476,4 +483,14 @@
 //    else
         return UITableViewCellEditingStyleDelete;
 }
+
+-(void)dealloc{
+    arrGroupId = nil;
+    arrIndivisualId = nil;
+    dictNameToId = nil;
+    
+    textView = nil;
+    viewUnderKeyboard = nil;
+}
+
 @end
