@@ -15,6 +15,9 @@
 //  Copyright (c) 2014 Jesse Squires
 //  Released under an MIT license: http://opensource.org/licenses/MIT
 //
+//  一定間隔でstream messageを実行しているが、メッセージを取得しても何もしていない
+//  相手を見つけて発見したらデバイスにarray_idとして格納(commonApi setIdArray)
+//  その相手をタップするとタイムラインに移行
 
 #import "JSQTableViewController.h"
 #import "EditProfileTableViewController.h"
@@ -63,7 +66,6 @@
     
     
     [super viewDidLoad];
-    
     
     
     
@@ -121,10 +123,11 @@
     
     
     
+    //合い言葉を設定するapiがまだない。
     //最終的にはtime_line_idからサーバー経由で合い言葉、chat相手のidを取得
-    arrGroupId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
-//    arrIndivisualId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"taro", @"jiro", nil];
-    arrIndivisualId = [NSMutableArray array];
+//    arrGroupId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
+    arrIndivisualId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"taro", @"jiro", nil];
+//    arrIndivisualId = [NSMutableArray array];
     
     dictNameToId = nil;
     
@@ -394,8 +397,10 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
                  
                  [SVProgressHUD showSuccessWithStatus:@"追加しました!"];
                  
-                 
                  //UICKeyChainStoreから格納用の配列を取得し、更新した上で再度格納する
+                 [CommonAPI addId:userInfo[@"user"][@"account_id"]];
+                 
+                 
                  
              }else{
                  [SVProgressHUD showSuccessWithStatus:@"既に追加されています!"];
@@ -463,8 +468,16 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     if(indexPath.section == 0){
+        NSLog(@"indexPath.sec%d, row%d = %@",
+              indexPath.section,
+              indexPath.row,
+              arrGroupId[indexPath.row]);
         cell.textLabel.text = arrGroupId[indexPath.row];//合い言葉
     }else{
+        NSLog(@"indexPath.sec%d, row%d = %@",
+              indexPath.section,
+              indexPath.row,
+              arrIndivisualId[indexPath.row]);
         cell.textLabel.text = arrIndivisualId[indexPath.row];//ID
     }
 //    if (indexPath.section == 0) {
@@ -535,6 +548,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
         [timer invalidate];
         
         JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
+        //おそらくここでtimelineに必要なパラメータの設定を行う(タイムラインidもしくは相手のid配列等)
         [self.navigationController pushViewController:vc animated:YES];
         
     }
@@ -586,6 +600,9 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     
     textField = nil;
     viewUnderKeyboard = nil;
+    
+    [self.timer invalidate];
+    self.timer = nil;
 }
 
 

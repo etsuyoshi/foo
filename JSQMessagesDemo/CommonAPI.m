@@ -12,6 +12,7 @@
 
 //IDを格納する配列を返す
 +(NSArray *)getIdArray{
+    NSLog(@"getIdarray");
     UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
     
     NSData *dataReturn = [store dataForKey:@"array_id"];
@@ -23,8 +24,14 @@
         NSLog(@"obj1 = %@", obj);
     }
     
-    dataReturn = nil;
+//    dataReturn = nil;
     store = nil;
+    
+    
+    if(arrayReturn == nil ||
+       [arrayReturn isEqual:[NSNull null]]){
+        arrayReturn = [NSMutableArray array];
+    }
     
     return arrayReturn;
 }
@@ -40,6 +47,7 @@
     
     //格納
     [store setData:dataInput forKey:@"array_id"];
+    [store synchronize];
     
     store = nil;
     dataInput = nil;
