@@ -31,5 +31,6 @@
     #import "SVProgressHUD.h"
     #import "UIImageView+WebCache.h"
     #import "DataConnect.h"
+    #import "CommonAPI.h"
 
 #endif

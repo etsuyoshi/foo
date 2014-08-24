@@ -182,12 +182,14 @@
     if(!(name      == nil || [name isEqual:[NSNull null]]) ||
        !(accountId == nil || [accountId isEqual:[NSNull null]])
        ){
-        if(name){
+        if(name != nil && ![name isEqual:[NSNull null]]){
             parameters[@"name"] = name;
+            NSLog(@"nameを%@に設定します", name);
         }
         
-        if(accountId){
+        if(accountId != nil && ![accountId isEqual:[NSNull null]]){
             parameters[@"account_id"] = accountId;
+            NSLog(@"account_idを%@に設定します", accountId);
         }
     }else{
         NSLog(@"null error");
@@ -210,5 +212,61 @@
        }];
     
 }
+
+//id配列からidと名前の関連づけを作成
+//+(void)createDictToUserName:(NSArray *)arrId{
+//    for(int i = 0;i < arrId.count;i++){
+//        [DataConnect:(NSString *)[UICKeyChainStore keyChainStoreWithService:@"ichat"]
+//         accountId:(NSString *)arrId[i]
+//         name:nil
+//         completion:(void (^)(NSDictionary *,
+//                              NSURLSessionDataTask *,
+//                              NSError *))block{
+//            
+//            
+//        }];
+//    }
+//}
+
+//+(void)createTimeLine
+
+-(void)receiveMessageToDeviceKey:(NSString *)deviceKey
+                      timeLineId:(NSString *)timeLineId
+                      completion:(void (^)(NSDictionary *,
+                                           NSURLSessionDataTask *,
+                                           NSError *))block{
+    NSMutableDictionary *parameters =
+    [NSMutableDictionary dictionary];
+    
+    if(deviceKey){
+        parameters[@"device_key"] = deviceKey;
+    }else{
+        NSLog(@"devicekey null");
+        return;
+    }
+    
+    if(timeLineId) {
+        parameters[@"time_line_id"] = timeLineId;
+    }else{
+        //do nothing
+    }
+    
+    
+    //メッセージを受信する
+    [self POST:@"/messages/stream"
+    parameters:parameters
+       success:^(NSURLSessionDataTask *task,
+                 id responseObject){
+           NSLog(@"success");
+           if(block)block(responseObject, task, nil);
+       }
+       failure:^(NSURLSessionDataTask *task,
+                 NSError *error){
+           NSLog(@"failure");
+           if(block)block(nil, task, error);
+       }];
+}
+
+
 
 @end

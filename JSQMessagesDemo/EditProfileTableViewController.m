@@ -35,7 +35,11 @@
 {
     [super viewDidLoad];
     
-    self.title = @"設定";
+    self.title =
+    [NSString stringWithFormat:@"設定(%@)",
+     [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"device_key"]];
+    NSLog(@"viewdidload at editprodileViewCon : key = %@",
+          [UICKeyChainStore keyChainStoreWithService:@"ichat"]);
     
     //saveButton
 //    UIBarButtonItem *saveButton = [[UIBarButtonItem alloc]
@@ -52,16 +56,16 @@
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
-    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
-//    NSLog(@"store = %@", store);
-    
-    accountId = store[@"account_id"];
-    name = store[@"name"];
-    deviceKey = store[@"device_key"];
-    
-    NSLog(@"accountId = %@\nname = %@\ndeviceKey = %@",
-          accountId, name, deviceKey);
+//    
+//    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+////    NSLog(@"store = %@", store);
+//    
+//    accountId = store[@"account_id"];
+//    name = store[@"name"];
+//    deviceKey = store[@"device_key"];
+//    
+//    NSLog(@"accountId = %@\nname = %@\ndeviceKey = %@",
+//          accountId, name, deviceKey);
     
 //    self.title = store[@"]
     
@@ -205,6 +209,7 @@
         
         tfName.delegate = self;
         tfName.placeholder = [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"];
+        NSLog(@"placeholder(%d) = %@", indexPath.section, tfName.placeholder);
         tfName.tag = indexPath.section;
         tfName.inputAccessoryView = toolBar;
         
@@ -225,6 +230,7 @@
         
         tfAccountId.delegate = self;
         tfAccountId.placeholder = [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"];
+        NSLog(@"placeholder(%d) = %@", indexPath.section, tfAccountId.placeholder);
         tfAccountId.tag = indexPath.section;
         tfAccountId.inputAccessoryView = toolBar;
         
@@ -247,7 +253,8 @@
 //            forControlEvents:UIControlEventTouchUpInside];
 //        [cell.contentView addSubview:useButton];
         
-        cell.textLabel.text = @"使用可能かどうか判定";
+        cell.textLabel.text = @"変更を反映する";
+        cell.textLabel.textAlignment = NSTextAlignmentCenter;
         cell.textLabel.textColor = [UIColor blackColor];
         return  cell;
     }
@@ -262,32 +269,40 @@
     
     [self.view endEditing:YES];
     
+    //testのためコメントアウト
     NSLog(@"tfName=%@, keychain=%@",
           tfName.text,
           [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"]);
-    //既に保存されているものと同じかどうか判定もしくはnull
-    if(tfName.text == nil || [tfName.text isEqual:[NSNull null]] ||
-       [tfName.text isEqualToString:@""] ||
-       [tfName.text isEqualToString:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"]]){
-        [self dispError:@"既に保存されているアカウント名と同じです"];
-        return;
-    }
-    
-    
     NSLog(@"tfAccountId=%@, keychain=%@",
           tfAccountId.text,
           [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"]);
-    if(tfAccountId.text == nil || [tfAccountId.text isEqual:[NSNull null]] ||
+    
+    //両方が既に保存されているものと同じかもしくはnullかどうか判定
+    if((
+       tfName.text == nil || [tfName.text isEqual:[NSNull null]] ||
+       [tfName.text isEqualToString:@""] ||
+       [tfName.text isEqualToString:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"]])
+       
+       &&(
+       tfAccountId.text == nil || [tfAccountId.text isEqual:[NSNull null]] ||
        [tfAccountId.text isEqualToString:@""] ||
-       [tfAccountId.text isEqualToString:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"]]){
-        [self dispError:@"既に保存されているアカウントIDと同じです"];
+       [tfAccountId.text isEqualToString:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"]])
+       ){
+        [self dispError:@"既に保存されているアカウント名、IDと同じです"];
         return;
+    }
+    
+    if([tfName.text isEqualToString:@""]){
+        tfName.text = [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"];
+    }
+    if([tfAccountId.text isEqualToString:@""]){
+        tfAccountId.text = [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"];
     }
     
     [[DataConnect sharedClient]
      updateUsersWithDeviceKey:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"device_key"]
-     accountId:tfAccountId.text//[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"]
-     name:tfName.text//[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"]
+     accountId:tfAccountId.text
+     name:tfName.text
     completion:^(NSDictionary *userInfo,
                   NSURLSessionDataTask *task,
                   NSError *error){
@@ -303,18 +318,19 @@
             [store
              setString:userInfo[@"user"][@"account_id"]
              forKey:@"account_id"];
+            [store synchronize];
+            NSLog(@"set accountid = %@", store[@"account_id"]);
             
 //            [[UICKeyChainStore keyChainStoreWithService:@"ichat"]
             [store
              setString:userInfo[@"user"][@"name"]
              forKey:@"name"];
+            [store synchronize];
+            NSLog(@"set name = %@", store[@"name"]);
             
+            NSLog(@"complete1");
+            [SVProgressHUD showSuccessWithStatus:@"更新成功しました!"];
             
-//            [SVProgressHUD showSuccessWithStatus:userInfo[@"user"]];
-            
-            
-            
-            //なぜか反映されていない！！！！！！！！！！！！！！！！！！！！！！！
             NSLog(@"complete = %@" , [UICKeyChainStore keyChainStoreWithService:@"ichat"]);
             return;
         }else if([userInfo[@"succeed"] intValue] == 0){
@@ -337,7 +353,7 @@
 
 -(void)dispError:(NSString *) errorContents{
     NSLog(@"disperror");
-    [SVProgressHUD showSuccessWithStatus:
+    [SVProgressHUD showErrorWithStatus:
      [NSString stringWithFormat:@"%@", errorContents]];
 }
 

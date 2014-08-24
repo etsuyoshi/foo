@@ -20,8 +20,11 @@
 
 @implementation JSQAppDelegate
 
+//毎回起動時に以下を実行→各画面のviewdidload時に実行することにした
+//device_key、name、account_idをサーバーから取得してデバイス側に保存されている組み合わせが正しいか確認する
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
     return YES;
 }
 

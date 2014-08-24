@@ -30,8 +30,9 @@
 
 
 
-
 @interface JSQDemoViewController : JSQMessagesViewController
+
+@property (nonatomic, weak) NSTimer *timerConversation;
 
 @property (weak, nonatomic) id<JSQDemoViewControllerDelegate> delegateModal;
 
@@ -40,6 +41,10 @@
 
 @property (strong, nonatomic) UIImageView *outgoingBubbleImageView;
 @property (strong, nonatomic) UIImageView *incomingBubbleImageView;
+
+
+
+@property (strong, nonatomic) NSString *strTimeLineId;
 
 - (void)receiveMessagePressed:(UIBarButtonItem *)sender;
 

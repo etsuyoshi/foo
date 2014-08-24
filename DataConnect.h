@@ -50,4 +50,10 @@
                      completion:(void (^)(NSDictionary *,
                                           NSURLSessionDataTask *,
                                           NSError *))block;
+
+-(void)receiveMessageToDeviceKey:(NSString *)deviceKey
+                      timeLineId:(NSString *)timeLineId
+                      completion:(void (^)(NSDictionary *,
+                                           NSURLSessionDataTask *,
+                                           NSError *))block;
 @end
