@@ -20,7 +20,11 @@
 
 #import "JSQDemoViewController.h"
 
-@interface JSQTableViewController : UITableViewController <JSQDemoViewControllerDelegate>
+@interface JSQTableViewController : UITableViewController
+<
+JSQDemoViewControllerDelegate
+, UITextFieldDelegate
+>
 
 @property (nonatomic, weak) NSTimer *timer;
 

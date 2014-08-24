@@ -24,12 +24,17 @@
     NSMutableArray *arrIndivisualId;
     NSMutableDictionary *dictNameToId;
     
-    UITextView *textView;
+    UITextField *textField;
     UIView *viewUnderKeyboard;
     
     BOOL isConnectMode;
     
     
+    //キーボード関連
+//    UIView *viewTable;
+//    UIView *viewForm;
+//    BOOL keyboardIsShown;
+//    int kTabBarHeight;
 }
 
 @synthesize timer;
@@ -38,9 +43,32 @@
 
 - (void)viewDidLoad
 {
+//    // register for keyboard notifications
+//    [[NSNotificationCenter defaultCenter] addObserver:self
+//                                             selector:@selector(keyboardWillShow:)
+//                                                 name:UIKeyboardWillShowNotification
+//                                               object:self.view.window];
+//    // register for keyboard notifications
+//    [[NSNotificationCenter defaultCenter] addObserver:self
+//                                             selector:@selector(keyboardWillHide:)
+//                                                 name:UIKeyboardWillHideNotification
+//                                               object:self.view.window];
+//    keyboardIsShown = NO;
+//    //make contentSize bigger than your scrollSize (you will need to figure out for your own use case)
+//    CGSize scrollContentSize = CGSizeMake(320, 345);
+//    self.tableView.contentSize = scrollContentSize;
+    
+    
+    
     
     
     [super viewDidLoad];
+    
+    
+    
+    
+    
+    
     
     isConnectMode = YES;
     
@@ -83,10 +111,11 @@
      action:@selector(edit)];
     self.navigationItem.leftBarButtonItem = editButton;
     
-    UIBarButtonItem *addButton = [[UIBarButtonItem alloc]
-                                   initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                   target:self
-                                   action:@selector(addId)];
+    UIBarButtonItem *addButton =
+    [[UIBarButtonItem alloc]
+     initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+     target:self
+     action:@selector(addId)];
     // Here I think you wanna add the searchButton and not the filterButton..
     self.navigationItem.rightBarButtonItem = addButton;
     
@@ -187,15 +216,51 @@
     EditProfileTableViewController *vc = [[EditProfileTableViewController alloc]init];
     [self.navigationController pushViewController:vc animated:YES];
 }
-//
--(void)addId{
-//    //keyboardを立ち上げる
-//    UITextView *textView = [[UITextView alloc]init];
-//    [self.view addSubview:textView];
-//    // キーボードを出す
-//    [textView becomeFirstResponder];
+
+-(void)alertView:
+(UIAlertView*)alertView
+clickedButtonAtIndex:(NSInteger)buttonIndex{
     
-    //念のため一旦隠す
+    NSLog(@"alertViewが選択されました.");
+    
+    switch (buttonIndex) {
+        case 0:
+            //１番目のボタンが押されたときの処理を記述する
+            NSLog(@"キャンセル");
+            break;
+        case 1:
+            //２番目のボタンが押されたときの処理を記述する
+            NSLog(@"text = %@",[alertView textFieldAtIndex:0].text);
+            [self determineAdd:[alertView textFieldAtIndex:0].text];
+            break;
+    }
+    
+    
+}
+
+//メニューの右ボタン；追加ボタン
+-(void)addId{
+    
+    //アラートメッセージで入力させる場合(開始)
+    NSLog(@"add id");
+    UIAlertView *alertView =
+    [[UIAlertView alloc]
+     initWithTitle:@"追加するidを入力して下さい"
+     message:@"人を追加するのかtimelineを入力させるか"
+     delegate:self
+     cancelButtonTitle:@"cancel"
+     otherButtonTitles:@"OK", nil];
+    alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    alertView.delegate = self;
+    [alertView show];
+    return;
+    //アラートメッセージ入力(終了)
+    
+    
+    
+    //カスタム入力フォーム
+    
+    //念のため(表示されている場合のために)一旦隠す
     [self dismissKeyBoard];
     
     
@@ -218,20 +283,35 @@
     [viewUnderKeyboard addGestureRecognizer:singleFingerTap];
     
     
+    //入力フィールドの場所を決定させるためにキーボードの位置を取得する
+    //CGSize keyboardSize = [[userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
     
     
     //
-    textView = [[UITextView alloc]init];
-    [viewUnderKeyboard addSubview:textView];
+    textField = [[UITextField alloc]init];
+    
+    textField.frame = CGRectMake(0, 100, self.view.bounds.size.width, 50);
+    //画面中心位置だと上すぎて不自然なので下にずらした
+    textField.center = CGPointMake(viewUnderKeyboard.center.x,
+                                   viewUnderKeyboard.center.y + 80);//viewUnderKeyboard.center;
+    textField.center = self.view.center;
+    textField.borderStyle = UITextBorderStyleRoundedRect;
+    textField.font = [UIFont systemFontOfSize:15];
+    textField.placeholder = @"enter id";
+    textField.autocorrectionType = UITextAutocorrectionTypeNo;
+    textField.keyboardType = UIKeyboardTypeDefault;
+    textField.returnKeyType = UIReturnKeyDone;
+    textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+    textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+    textField.delegate = self;
+    [viewUnderKeyboard addSubview:textField];
+    
     
     // ボタンを配置するUIViewを作成
-    UIView* accessoryView = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,39)];
+    UIView* accessoryView = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.bounds.size.width,39)];
     accessoryView.backgroundColor = [UIColor whiteColor];
+//    [accessoryView addSubview:textField];//これをやるとキーボードが表示されない(おそらくキーボードの生成とaccessoryの生成が無限ループになっている可能性)
     
-//    textView.frame = CGRectMake(150, 0, 100, 50);
-//    [accessoryView addSubview:textView];
-    
-    //新規にテキストフィールドを作成してaccessoryViewに貼付ける
     
     
     //キャンセルボタン
@@ -250,19 +330,20 @@
     // 決定ボタンを作成
     UIButton* decideButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     decideButton.frame = CGRectMake(250,5,100,30);
-    [decideButton setTitle:@"決定" forState:UIControlStateNormal];
+
     [decideButton// ボタンを押したときに呼ばれる動作を設定
      addTarget:self
      action:@selector(determineAdd)
      forControlEvents:UIControlEventTouchUpInside];
     
+    
     // ボタンをViewに追加
     [accessoryView addSubview:decideButton];
     
-    // ビューをUITextViewのinputAccessoryViewに設定
-    textView.inputAccessoryView = accessoryView;
+    // ビューをUITextFieldのinputAccessoryViewに設定
+    textField.inputAccessoryView = accessoryView;
     
-    [textView becomeFirstResponder];
+    [textField becomeFirstResponder];
     
     [UIView
      animateWithDuration:0.8f
@@ -276,9 +357,18 @@
     
 }
 
-//決定ボタンを押したとき
+
+//キーボードの入力パターンで二通りの渡し方を用意した
+//決定ボタンを押したとき:
 -(void)determineAdd{
-    NSLog(@"determine : text = %@", textView.text);
+    
+    [self determineAdd:textField.text];
+}
+
+//上記determinAdd及びテキストフィールドから決定ボタンが押されたとき
+-(void)determineAdd:(NSString *)strText{
+
+    NSLog(@"determine : text = %@", strText);
     
     
     UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
@@ -286,12 +376,12 @@
     //idが存在していればtableViewの行を一つ増やす
     [[DataConnect sharedClient]
      findUserWithDeviceKey:strDeviceKey
-     accountId:textView.text
+     accountId:strText
      completion:^(NSDictionary *userInfo,
                   NSURLSessionDataTask *task,
                   NSError *error){
          NSLog(@"userinfo = %@", userInfo);
-         NSLog(@"succeed = %@ : %@", userInfo[@"succeed"], [userInfo[@"succeed"] class]);
+//         NSLog(@"succeed = %@ : %@", userInfo[@"succeed"], [userInfo[@"succeed"] class]);//1:BOOL
          if(userInfo == nil || [userInfo isEqual:[NSNull null]]){
              [self dispError:1];
          }else if([userInfo[@"succeed"] intValue] == 1){
@@ -302,6 +392,10 @@
                  [self.tableView reloadData];
                  
                  [SVProgressHUD showSuccessWithStatus:@"追加しました!"];
+                 
+                 
+                 //UICKeyChainStoreから格納用の配列を取得し、更新した上で再度格納する
+                 
              }else{
                  [SVProgressHUD showSuccessWithStatus:@"既に追加されています!"];
              }
@@ -329,7 +423,7 @@
 //キーボードを消すのみ
 -(void)dismissKeyBoard{
     NSLog(@"dismissKeyboard");
-    textView = nil;
+    textField = nil;
     [viewUnderKeyboard removeFromSuperview];
     viewUnderKeyboard = nil;
 
@@ -489,8 +583,58 @@
     arrIndivisualId = nil;
     dictNameToId = nil;
     
-    textView = nil;
+    textField = nil;
     viewUnderKeyboard = nil;
 }
+
+
+//- (void)keyboardWillHide:(NSNotification *)n
+//{
+//    NSLog(@"keyboard will hide");
+//    NSDictionary* userInfo = [n userInfo];
+//    
+//    // get the size of the keyboard
+//    CGSize keyboardSize = [[userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+//    
+//    
+//    // resize the scrollview
+//    CGRect viewFrame = self.tableView.frame;
+//    // I'm also subtracting a constant kTabBarHeight because my UIScrollView was offset by the UITabBar so really only the portion of the keyboard that is leftover pass the UITabBar is obscuring my UIScrollView.
+//    viewFrame.size.height += (keyboardSize.height - kTabBarHeight);
+//    
+//    [UIView beginAnimations:nil context:NULL];
+//    [UIView setAnimationBeginsFromCurrentState:YES];
+//    [self.tableView setFrame:viewFrame];
+//    [UIView commitAnimations];
+//    
+//    keyboardIsShown = NO;
+//}
+//
+//- (void)keyboardWillShow:(NSNotification *)n
+//{
+//    NSLog(@"keyboard will show");
+//    // This is an ivar I'm using to ensure that we do not do the frame size adjustment on the `UIScrollView` if the keyboard is already shown.  This can happen if the user, after fixing editing a `UITextField`, scrolls the resized `UIScrollView` to another `UITextField` and attempts to edit the next `UITextField`.  If we were to resize the `UIScrollView` again, it would be disastrous.  NOTE: The keyboard notification will fire even when the keyboard is already shown.
+//    if (keyboardIsShown) {
+//        return;
+//    }
+//    
+//    NSDictionary* userInfo = [n userInfo];
+//    
+//    // get the size of the keyboard
+//    CGSize keyboardSize = [[userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+//    
+//    // resize the noteView
+//    CGRect viewFrame = self.tableView.frame;
+//    // I'm also subtracting a constant kTabBarHeight because my UIScrollView was offset by the UITabBar so really only the portion of the keyboard that is leftover pass the UITabBar is obscuring my UIScrollView.
+//    viewFrame.size.height -= (keyboardSize.height - kTabBarHeight);
+//    
+//    [UIView beginAnimations:nil context:NULL];
+//    [UIView setAnimationBeginsFromCurrentState:YES];
+//    [self.tableView setFrame:viewFrame];
+//    [UIView commitAnimations];
+//    keyboardIsShown = YES;
+//}
+
+
 
 @end
