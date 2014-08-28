@@ -80,28 +80,29 @@
         NSLog(@"重複しているので追加しません。");
         return false;
     }else{
-        
+        NSLog(@"追加 : dictUser = %@", dictUser);
         [arrId addObject:dictUser];
-        
         [CommonAPI setIdArray:arrId];
         return true;
     }
 }
 
+//デバイスに保存されているdictUser配列の中にaccount_idのuserInfoが存在していればtrueを返す
 +(BOOL)containsObject:(NSDictionary *)dictUser{
-    //既存のarray_idにdictUserのaccount_idが存在していればtrueを返す
     NSMutableArray *arrayInDevice = [[self getIdArray] mutableCopy];
     for(NSDictionary *dictInDevice in arrayInDevice){
         NSLog(@"account_id = %@", dictUser[@"account_id"]);
         NSLog(@"dictInDevice = %@", dictInDevice);
         if(  dictUser[@"account_id"] != nil &&
            ![dictUser[@"account_id"] isEqual:[NSNull null]] &&
-           dictInDevice != nil &&
+            dictInDevice != nil &&
            ![dictInDevice isEqual:[NSNull null]]){
             
             if([dictInDevice[@"account_id"] isEqualToString:dictUser[@"account_id"]]){
                 return true;
             }
+        }else{
+            NSLog(@"aaaaaaa");
         }
     }
     return false;

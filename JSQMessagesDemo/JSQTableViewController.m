@@ -18,13 +18,20 @@
 //  一定間隔でstream messageを実行しているが、メッセージを取得しても何もしていない
 //  相手を見つけて発見したらデバイスにarray_idとして格納(commonApi setIdArray)
 //  その相手をタップするとタイムラインに移行
-//  arrIndivisualIdはaccount_idだけ
+//  arrIndivisualIdはaccount_idだけ->だめ
+//  arrIndivisualIdはuserInfo[account_id, name, timeLineId]
 
 #import "JSQTableViewController.h"
 #import "EditProfileTableViewController.h"
 
 @implementation JSQTableViewController{
     NSMutableArray *arrGroupId;
+    
+    
+    //account_id, name, timeLineIdの組合せ辞書を一つの要素とする配列にする
+    //account_id文字列を要素とする配列にした方が初期開発段階のこのクラス上ではきれいになる(containObject等使用時)が、TL画面でtimeLineIdと紐づけられない
+    //さらに既にあるタイムラインに対して過去のメッセージを取得するのにこのtmidが必要になるので保有していた方が良い
+    //これにより既にタイムライン上でメッセージのやりとりがあるかどうかも判定できる(NSString <-> nil)
     NSMutableArray *arrIndivisualId;
     NSMutableDictionary *dictNameToId;
     
@@ -67,9 +74,9 @@
     
     
     
-//    //temporary:when reset
-//    NSArray *array = [NSArray array];
-//    [CommonAPI setIdArray:array];
+    //temporary:when reset : clear
+    NSArray *array = [NSArray array];
+    [CommonAPI setIdArray:array];
     
     
     
@@ -128,10 +135,12 @@
     //最終的にはtime_line_idからサーバー経由で合い言葉、chat相手のidを取得
 //    arrGroupId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
     //以下account_idの文字列のみ格納された配列になっている
-    NSArray *arrTmp = [[CommonAPI getIdArray] mutableCopy];//i.e.[NSMutableArray arrayWithObjects:@"taro", @"jiro",
+//    NSArray *arrTmp = [[CommonAPI getIdArray] mutableCopy];//i.e.[NSMutableArray arrayWithObjects:@"taro", @"jiro",
+    NSArray *arrTmp = [[CommonAPI getIdArray] mutableCopy];//i.e. factor -> [account_id, name, timeLineId]
     arrIndivisualId = [NSMutableArray array];
     for(int i = 0;i < arrTmp.count;i++){
-        [arrIndivisualId addObject:arrTmp[i][@"account_id"]];
+//        [arrIndivisualId addObject:arrTmp[i][@"account_id"]];
+        [arrIndivisualId addObject:arrTmp[i]];
     }
     NSLog(@"arrIndivisualId = %@", arrIndivisualId);
     
@@ -399,9 +408,12 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
          }else if([userInfo[@"succeed"] intValue] == 1){
              //id検索に成功した場合
              
-             if(![arrIndivisualId containsObject:userInfo[@"user"][@"account_id"]]){
+             //デバイスに保存されているユーザー情報配列の中にaccount_idが含まれているか
+//             if(![arrIndivisualId containsObject:userInfo[@"user"][@"account_id"]]){
+             if(![self containsIndivisualId:userInfo[@"user"][@"account_id"]]){
                  
-                 [arrIndivisualId addObject:userInfo[@"user"][@"account_id"]];
+//                 [arrIndivisualId addObject:userInfo[@"user"][@"account_id"]];
+                 [arrIndivisualId addObject:userInfo[@"user"]];
                  [self.tableView reloadData];
                  
                  [SVProgressHUD showSuccessWithStatus:@"追加しました!"];
@@ -434,6 +446,18 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
      
      [self dismissKeyBoard];
      store = nil;
+}
+
+//arrIndivisualIdの中にstrIdのaccount_idのuserInfo[account_id, name, timelineid]が含まれているか
+-(BOOL)containsIndivisualId:(NSString *)strId{
+    for(NSDictionary *dictUser in arrIndivisualId){
+        if([dictUser[@"account_id"] isEqualToString:strId]){
+            NSLog(@"match strId %@ in device", strId);
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 -(void)dispError:(int)errorCode{
@@ -502,7 +526,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
               (int)indexPath.section,
               (int)indexPath.row,
               arrIndivisualId[indexPath.row]);
-        cell.textLabel.text = arrIndivisualId[indexPath.row];//ID
+//        cell.textLabel.text = arrIndivisualId[indexPath.row];//ID
+        cell.textLabel.text = arrIndivisualId[indexPath.row][@"account_id"];
         NSLog(@"aaa %i, %i",
               indexPath.section,
               indexPath.row);
@@ -594,8 +619,9 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
         UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
         NSString *strDeviceKey = store[@"device_key"];
         
-        
-        NSString *strAccountId = arrIndivisualId[indexPath.row];
+        //遷移先に送る為のaccount_idとnameの組み合わせを作成するため
+//        NSString *strAccountId = arrIndivisualId[indexPath.row];
+        NSString *strAccountId = arrIndivisualId[indexPath.row][@"account_id"];
         [[DataConnect sharedClient]
          findUserWithDeviceKey:strDeviceKey
          accountId:strAccountId
@@ -604,8 +630,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
                      NSError *error){
              NSArray *arrUsers = [NSArray arrayWithObjects:userInfo[@"user"], nil];
              JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
-             vc.timeLineUsers = arrUsers;
-             NSLog(@"vc.timelineusers = %@", vc.timeLineUsers);
+             vc.arrTimeLineUsers = arrUsers;
+             NSLog(@"vc.timelineusers = %@", vc.arrTimeLineUsers);
              [self.navigationController pushViewController:vc animated:YES];
              arrUsers = nil;
          }];
