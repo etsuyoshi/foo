@@ -11,9 +11,10 @@
 @interface CommonAPI : NSObject
 
 
-
 +(void)setIdArray:(NSArray *)arrayInput;
 +(NSArray *)getIdArray;
 +(BOOL)addId:(NSString *)strId;
++(NSString *)getIdNoAt:(int)no;
 //+(NSArray *)initArrayGroupId;
+
 @end

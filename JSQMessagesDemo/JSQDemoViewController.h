@@ -32,6 +32,8 @@
 
 @interface JSQDemoViewController : JSQMessagesViewController
 
+//タイムラインに必要なデータ(相手のid、name、id等)
+@property (nonatomic, copy) NSArray *timeLineUsers;
 @property (nonatomic, weak) NSTimer *timerConversation;
 
 @property (weak, nonatomic) id<JSQDemoViewControllerDelegate> delegateModal;

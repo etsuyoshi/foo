@@ -71,6 +71,7 @@
 //              if (block) block(nil, task, error);
 //          }
       }];
+    
 }
 
 
@@ -123,6 +124,7 @@
           if(block)block(nil, task, error);
       }];
     
+    parameters = nil;
     
 }
 
@@ -135,6 +137,7 @@
     NSMutableDictionary *parameters =
     [NSMutableDictionary dictionary];
     
+    //deviceKeyいらない
     if(deviceKey){
         parameters[@"device_key"] = deviceKey;
     }else{
@@ -161,6 +164,7 @@
            if(block)block(nil, task, error);
        }];
     
+    parameters = nil;
     
 }
 
@@ -210,6 +214,7 @@
            NSLog(@"failure");
            if(block)block(nil, task, error);
        }];
+    parameters = nil;
     
 }
 
@@ -265,8 +270,72 @@
            NSLog(@"failure");
            if(block)block(nil, task, error);
        }];
+    parameters = nil;
 }
 
 
+-(void)postMessageToDeviceKey:(NSString *)deviceKey//required
+                   timeLineId:(NSString *)timeLineId//required toward exist timeline
+                      members:(NSArray *)arrMembers//required
+                      message:(NSString *)strMessage//required
+                   completion:(void (^)(NSDictionary *,
+                                        NSURLSessionDataTask *,
+                                        NSError *))block{
+
+    NSMutableDictionary *parameters =
+    [NSMutableDictionary dictionary];
+    
+    if(deviceKey){
+        parameters[@"device_key"] = deviceKey;
+    }else{
+        NSLog(@"devicekey null");
+        parameters = nil;
+        return;
+    }
+    
+    if(timeLineId) {
+        parameters[@"time_line_id"] = timeLineId;
+    }else{
+        //do nothing
+        NSLog(@"time_line_id create by api caz no id sended");
+    }
+    
+    if(strMessage){
+        parameters[@"message"] = strMessage;
+    }else{
+        NSLog(@"message is null");
+        parameters = nil;
+        return;
+    }
+    if(arrMembers){
+        //time_line_id is null... but continue to create new timeline
+        NSLog(@"return caz arrMembers is nil");
+        parameters = nil;
+        return;
+    }else if(arrMembers.count == 0){
+        NSLog(@"return caz no members");
+        parameters = nil;
+        return;
+    }else{
+        parameters[@"members"] = arrMembers;
+    }
+    
+    
+    
+    //メッセージを受信する
+    [self POST:@"/messages/post"
+    parameters:parameters
+       success:^(NSURLSessionDataTask *task,
+                 id responseObject){
+           NSLog(@"success");
+           if(block)block(responseObject, task, nil);
+       }
+       failure:^(NSURLSessionDataTask *task,
+                 NSError *error){
+           NSLog(@"failure");
+           if(block)block(nil, task, error);
+       }];
+    parameters = nil;
+}
 
 @end
