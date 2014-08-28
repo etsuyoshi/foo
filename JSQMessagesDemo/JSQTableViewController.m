@@ -18,6 +18,7 @@
 //  一定間隔でstream messageを実行しているが、メッセージを取得しても何もしていない
 //  相手を見つけて発見したらデバイスにarray_idとして格納(commonApi setIdArray)
 //  その相手をタップするとタイムラインに移行
+//  arrIndivisualIdはaccount_idだけ
 
 #import "JSQTableViewController.h"
 #import "EditProfileTableViewController.h"
@@ -62,13 +63,13 @@
 //    self.tableView.contentSize = scrollContentSize;
     
     
-    
-    
-    
     [super viewDidLoad];
     
     
     
+//    //temporary:when reset
+//    NSArray *array = [NSArray array];
+//    [CommonAPI setIdArray:array];
     
     
     
@@ -126,12 +127,17 @@
     //合い言葉を設定するapiがまだない。
     //最終的にはtime_line_idからサーバー経由で合い言葉、chat相手のidを取得
 //    arrGroupId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
-    arrIndivisualId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"taro", @"jiro", nil];
-//    arrIndivisualId = [NSMutableArray array];
+    //以下account_idの文字列のみ格納された配列になっている
+    NSArray *arrTmp = [[CommonAPI getIdArray] mutableCopy];//i.e.[NSMutableArray arrayWithObjects:@"taro", @"jiro",
+    arrIndivisualId = [NSMutableArray array];
+    for(int i = 0;i < arrTmp.count;i++){
+        [arrIndivisualId addObject:arrTmp[i][@"account_id"]];
+    }
+    NSLog(@"arrIndivisualId = %@", arrIndivisualId);
     
     dictNameToId = nil;
     
-    
+    NSLog(@"finish didload");
     
     
     //cellが反応しない
@@ -147,6 +153,8 @@
     [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
     
     [self.tableView reloadData];
+    
+    NSLog(@"finish viewwillappear");
 }
 
 -(void)checkMessage:(NSTimer *)timer{
@@ -172,7 +180,7 @@
             //データ通信中なので通信可能状態に設定
             isConnectMode = YES;
             
-            NSLog(@"succeed = %d", [userInfo[@"succeed"] integerValue]);
+            NSLog(@"succeed = %d", (int)[userInfo[@"succeed"] integerValue]);
             NSLog(@"message = %@", userInfo[@"messages"]);
             
             if([userInfo[@"succeed"] integerValue] == 1){
@@ -184,7 +192,7 @@
                 NSLog(@"メッセージがnullです。");
             }
             
-            int numOfMessages = ((NSArray *)userInfo[@"messages"]).count;
+            int numOfMessages = (int)((NSArray *)userInfo[@"messages"]).count;
             if(numOfMessages == 0){
                 NSLog(@"メッセージの個数がゼロ");
             }else{
@@ -392,13 +400,26 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
              //id検索に成功した場合
              
              if(![arrIndivisualId containsObject:userInfo[@"user"][@"account_id"]]){
+                 
                  [arrIndivisualId addObject:userInfo[@"user"][@"account_id"]];
                  [self.tableView reloadData];
                  
                  [SVProgressHUD showSuccessWithStatus:@"追加しました!"];
                  
+                 //デバイスに格納する相手に関する情報
+                 //将来的にタップした時にtimelineに渡される辞書になる。
                  //UICKeyChainStoreから格納用の配列を取得し、更新した上で再度格納する
-                 [CommonAPI addId:userInfo[@"user"][@"account_id"]];
+//                 [CommonAPI addId:userInfo[@"user"][@"account_id"]];
+                 //account_idではなくnameとaccount_id両方保存する
+                 BOOL isSuccessAdd = [CommonAPI addId:userInfo[@"user"]];
+                 if(isSuccessAdd){
+                     NSLog(@"保存成功");
+                 }else{
+                     NSLog(@"保存失敗");
+                 }
+                 
+//                 NSMutableDictionary *dictPerson = [NSMutableDictionary dictionary];
+//                 dictPerson[@"members"] = [NSArray arrayWithObjects:userInfo[@"user"][@"account_id"], nil];//account_idを格納する
                  
                  
                  
@@ -445,8 +466,10 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if(section == 0){
+        NSLog(@"arrgroup = %d", arrGroupId.count);
         return arrGroupId.count;
     }else{
+        NSLog(@"arrind = %d", arrIndivisualId.count);
         return  arrIndivisualId.count;
     }
 }
@@ -461,6 +484,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    NSLog(@"return : %d, %d", (int)indexPath.section, (int)indexPath.row);
     static NSString *CellIdentifier = @"CellIdentifier";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
@@ -469,16 +493,19 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     }
     if(indexPath.section == 0){
         NSLog(@"indexPath.sec%d, row%d = %@",
-              indexPath.section,
-              indexPath.row,
+              (int)indexPath.section,
+              (int)indexPath.row,
               arrGroupId[indexPath.row]);
-        cell.textLabel.text = arrGroupId[indexPath.row];//合い言葉
+        cell.textLabel.text = arrGroupId[indexPath.row][@"group_name"];//合い言葉 or Group_name?
     }else{
         NSLog(@"indexPath.sec%d, row%d = %@",
-              indexPath.section,
-              indexPath.row,
+              (int)indexPath.section,
+              (int)indexPath.row,
               arrIndivisualId[indexPath.row]);
         cell.textLabel.text = arrIndivisualId[indexPath.row];//ID
+        NSLog(@"aaa %i, %i",
+              indexPath.section,
+              indexPath.row);
     }
 //    if (indexPath.section == 0) {
 //        switch (indexPath.row) {
@@ -501,11 +528,15 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 //        }
 //    }
     
+    
+    
     return cell;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
+    NSLog(@"%@",
+          (section == [tableView numberOfSections] - 1) ? @"Copyright © 2014\nBASE一同\n" : nil);
     return (section == [tableView numberOfSections] - 1) ? @"Copyright © 2014\nBASE一同\n" : nil;
 }
 
@@ -548,18 +579,37 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
         [timer invalidate];
         
         JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
+//postするときに必要なデータ
+//        device_key	string          Required. Device Key that was issued when you create the user.
+//        time_line_id	string          Required for the time line. The ID of the time line.
+//        members       string array    Required for new time line. Account IDs of the time line.
+//        message       string          Required. The contents of message.
+//        vc.timeLineData = nil;//[[CommonAPI getIdArray] objectAtIndex:indexPath.row];//デバイスに保存されたNSDictionaryを取得して渡す
         //おそらくここでtimelineに必要なパラメータの設定を行う(タイムラインidもしくは相手のid配列等)
         [self.navigationController pushViewController:vc animated:YES];
         
     }
     
     if(indexPath.section == 1){
+        UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+        NSString *strDeviceKey = store[@"device_key"];
         
         
-        
-        JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
-        vc.strTimeLineId = @"";
-        [self.navigationController pushViewController:vc animated:YES];
+        NSString *strAccountId = arrIndivisualId[indexPath.row];
+        [[DataConnect sharedClient]
+         findUserWithDeviceKey:strDeviceKey
+         accountId:strAccountId
+         completion:^(NSDictionary *userInfo,
+                     NSURLSessionDataTask *task,
+                     NSError *error){
+             NSArray *arrUsers = [NSArray arrayWithObjects:userInfo[@"user"], nil];
+             JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
+             vc.timeLineUsers = arrUsers;
+             NSLog(@"vc.timelineusers = %@", vc.timeLineUsers);
+             [self.navigationController pushViewController:vc animated:YES];
+             arrUsers = nil;
+         }];
+        store = nil;
     }
 }
 

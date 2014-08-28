@@ -19,6 +19,11 @@
 
 //sendボタンを完了ボタンにして押下後キーボード消去[self.view endEditing:YES];
 
+//postするときに必要なデータ
+//        device_key	string          Required. Device Key that was issued when you create the user.
+//        time_line_id	string          Required for the time line. The ID of the time line.
+//        members       string array    Required for new time line. Account IDs of the time line.
+//        message       string          Required. The contents of message.
 
 #import "JSQDemoViewController.h"
 #import "PersonViewController.h"
@@ -41,6 +46,8 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 
 @synthesize strTimeLineId;
 @synthesize timerConversation;
+@synthesize timeLineUsers;//messages/postに必要なtime_line_idとmembers(相手のaccount_idとnameの組合せ辞書を格納している配列)
+//time_line_idは新規の場合、nilで最初のポストで返りに新規idが付与される
 
 #pragma mark - Demo setup
 
@@ -133,6 +140,8 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    NSLog(@"timeLineUsers = %@", self.timeLineUsers);
     
     self.title = @"base time line";
     
@@ -340,7 +349,6 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
     
     
     timerConversation = [NSTimer
