@@ -44,9 +44,13 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     NameTableView *tableView;
 }
 
+//はじめて一対一で話をする時はtimeLineIdは存在しないのでヌルのまま
+//その場合、メッセージを送った(postした)ときに初めてtimeLineIdが配布されるのでそれを登録する(未実装)
+//その場合、登録方法はUICKeyChainに保存する！(未実装)
+//次回以降(既存のタイムラインに対して)timelineを選択する場合には上記で保存したtimelineidをuickeychainを使ってサーバーに問い合わせて(TL画面に遷移後)過去メッセージを取得する(未実装)
 @synthesize strTimeLineId;
 @synthesize timerConversation;
-@synthesize timeLineUsers;//messages/postに必要なtime_line_idとmembers(相手のaccount_idとnameの組合せ辞書を格納している配列)
+@synthesize arrTimeLineUsers;//messages/postに必要なtime_line_idとmembers(相手のaccount_idとnameの組合せ辞書を格納している配列)
 //time_line_idは新規の場合、nilで最初のポストで返りに新規idが付与される
 
 #pragma mark - Demo setup
@@ -117,12 +121,18 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
      *  Change to YES to add a super long message for testing
      *  You should see "END" twice
      */
-    BOOL addREALLYLongMessage = NO;
+    BOOL addREALLYLongMessage = YES;
     if (addREALLYLongMessage) {
         JSQMessage *reallyLongMessage = [JSQMessage messageWithText:@"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? END Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? END" sender:self.sender];
         [self.messages addObject:reallyLongMessage];
     }
 }
+
+
+//-(void)sendMessage:(NSString *)strMessage toId:(NSString *)strAccountId{
+//    JSQMessage *jsqMessage = [JSQMessage messageWithText:strMessage sender:strAccountId];
+//    [self.messages addObject:jsqMessage];
+//}
 
 
 
@@ -141,7 +151,7 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 {
     [super viewDidLoad];
     
-    NSLog(@"timeLineUsers = %@", self.timeLineUsers);
+    NSLog(@"timeLineUsers = %@", self.arrTimeLineUsers);
     
     self.title = @"base time line";
     
@@ -180,7 +190,7 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 //    self.navigationItem.leftBarButtonItem = barLeftButtonItem;
     
     
-    [self setupTestModel];
+//    [self setupTestModel];
     
     /**
      *  Remove camera button since media messages are not yet implemented
@@ -236,7 +246,7 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 }
 
 -(void)checkMessage:(NSTimer *)timer{
-    NSLog(@"bbb");
+    NSLog(@"checkmessage");
     
 }
 
@@ -449,20 +459,26 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     
     
     UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
-    
-//    NSString *strDeviceKey = store[@"device_key"];
-    
-    if(store[@"time_line_id"]){
-        
-        NSLog(@"time_line_id = %@", store[@"time_line_id"]);
-        //return;
+    NSString *strDeviceKey = store[@"device_key"];
+//
+//    if(store[@"time_line_id"]){
+//        
+//        NSLog(@"time_line_id = %@", store[@"time_line_id"]);
+//        //return;
+//    }
+    //送り先配列の作成
+    NSMutableArray *arrUserIdToSend = [NSMutableArray array];
+    for(id userInfo in self.arrTimeLineUsers){
+        [arrUserIdToSend addObject:userInfo[@"account_id"]];
     }
+    
     //あと、/messages/postの引数のmembersは普通に配列として投げてやれば受け取れるんですかね？
     [[DataConnect sharedClient]
-     sendMessage:(NSString *)message
-     deviceKey:(NSString *)store[@"device_key"]
-     timeLineId:(NSString *)store[@"time_line_id"]
-     members:(NSArray *)[NSArray arrayWithObjects:@"taro", @"jiro", nil]
+     sendMessage:text
+     deviceKey:strDeviceKey
+     timeLineId:self.strTimeLineId
+//     members:(NSArray *)[NSArray arrayWithObjects:@"taro", @"jiro", nil]
+     members:arrUserIdToSend
      completion:^(NSDictionary *userInfo,
                   NSURLSessionDataTask *task,
                   NSError *error){

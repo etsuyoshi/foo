@@ -25,6 +25,12 @@
 
 @implementation JSQTableViewController{
     NSMutableArray *arrGroupId;
+    
+    
+    //account_id, name, timeLineIdの組合せ辞書を一つの要素とする配列にする
+    //account_id文字列を要素とする配列にした方が初期開発段階のこのクラス上ではきれいになる(containObject等使用時)が、TL画面でtimeLineIdと紐づけられない
+    //さらに既にあるタイムラインに対して過去のメッセージを取得するのにこのtmidが必要になるので保有していた方が良い
+    //これにより既にタイムライン上でメッセージのやりとりがあるかどうかも判定できる(NSString <-> nil)
     NSMutableArray *arrIndivisualId;
     NSMutableDictionary *dictNameToId;
     
@@ -594,7 +600,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
         UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
         NSString *strDeviceKey = store[@"device_key"];
         
-        
+        //遷移先に送る為のaccount_idとnameの組み合わせを作成するため
         NSString *strAccountId = arrIndivisualId[indexPath.row];
         [[DataConnect sharedClient]
          findUserWithDeviceKey:strDeviceKey
@@ -604,8 +610,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
                      NSError *error){
              NSArray *arrUsers = [NSArray arrayWithObjects:userInfo[@"user"], nil];
              JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
-             vc.timeLineUsers = arrUsers;
-             NSLog(@"vc.timelineusers = %@", vc.timeLineUsers);
+             vc.arrTimeLineUsers = arrUsers;
+             NSLog(@"vc.timelineusers = %@", vc.arrTimeLineUsers);
              [self.navigationController pushViewController:vc animated:YES];
              arrUsers = nil;
          }];
