@@ -110,7 +110,7 @@
         NSLog(@"message null");
         return;
     }
-    
+    NSLog(@"/message/post : %@", parameters);
     [self POST:@"/messages/post"
    parameters:parameters
       success:^(NSURLSessionDataTask *task,
@@ -120,7 +120,7 @@
       }
       failure:^(NSURLSessionDataTask *task,
                 NSError *error){
-          NSLog(@"failure");
+          NSLog(@"failure : error= %@", error);
           if(block)block(nil, task, error);
       }];
     
@@ -129,6 +129,15 @@
 }
 
 //POST /users/find
+/*
+ userinfo = {
+     succeed = 1;
+     user =     {
+        "account_id" = taro;
+        name = TARO;
+     };
+ 
+ */
 -(void)findUserWithDeviceKey:(NSString *)deviceKey
            accountId:(NSString *)accountId
         completion:(void (^)(NSDictionary *,

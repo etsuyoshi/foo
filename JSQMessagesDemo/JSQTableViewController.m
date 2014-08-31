@@ -18,7 +18,7 @@
 //  一定間隔でstream messageを実行しているが、メッセージを取得しても何もしていない
 //  相手を見つけて発見したらデバイスにarray_idとして格納(commonApi setIdArray)
 //  その相手をタップするとタイムラインに移行
-//  arrIndivisualIdはaccount_idだけ->だめ
+//  arrIndivisualIdはaccount_idだけ->だめ!!!!
 //  arrIndivisualIdはuserInfo[account_id, name, timeLineId]
 
 #import "JSQTableViewController.h"
@@ -28,7 +28,7 @@
     NSMutableArray *arrGroupId;
     
     
-    //account_id, name, timeLineIdの組合せ辞書を一つの要素とする配列にする
+    //account_id, name, timeLineIdの組合せ辞書を一つの要素とする配列にする：arrIndivisualId済(名称はファクタリングした方が良い)
     //account_id文字列を要素とする配列にした方が初期開発段階のこのクラス上ではきれいになる(containObject等使用時)が、TL画面でtimeLineIdと紐づけられない
     //さらに既にあるタイムラインに対して過去のメッセージを取得するのにこのtmidが必要になるので保有していた方が良い
     //これにより既にタイムライン上でメッセージのやりとりがあるかどうかも判定できる(NSString <-> nil)
@@ -74,9 +74,9 @@
     
     
     
-    //temporary:when reset : clear
-    NSArray *array = [NSArray array];
-    [CommonAPI setIdArray:array];
+//    //temporary:when reset : clear
+//    NSArray *array = [NSArray array];
+//    [CommonAPI setIdArray:array];
     
     
     
@@ -141,6 +141,11 @@
     for(int i = 0;i < arrTmp.count;i++){
 //        [arrIndivisualId addObject:arrTmp[i][@"account_id"]];
         [arrIndivisualId addObject:arrTmp[i]];
+        
+        //強制的にtimelineidを入力させる
+//        arrIndivisualId[i][@"time_line_id"] = @"32";
+//        [CommonAPI modifyTimeLineId:@"32"
+//                           toUserId:[arrIndivisualId lastObject][@"account_id"]];
     }
     NSLog(@"arrIndivisualId = %@", arrIndivisualId);
     
@@ -159,7 +164,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    //[self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
     
     [self.tableView reloadData];
     
@@ -189,24 +194,30 @@
             //データ通信中なので通信可能状態に設定
             isConnectMode = YES;
             
-            NSLog(@"succeed = %d", (int)[userInfo[@"succeed"] integerValue]);
-            NSLog(@"message = %@", userInfo[@"messages"]);
+            NSLog(@"tableview : succeed = %d", (int)[userInfo[@"succeed"] integerValue]);
+            NSLog(@"tableview : message = %@", userInfo[@"messages"]);
             
             if([userInfo[@"succeed"] integerValue] == 1){
-                NSLog(@"通信成功");
+                NSLog(@"tableview : 通信成功");
             }
             
             if(userInfo[@"messages"] == nil ||
                [userInfo[@"messages"] isEqual:[NSNull null]]){
-                NSLog(@"メッセージがnullです。");
+                NSLog(@"tableview : メッセージがnullです。");
             }
             
             int numOfMessages = (int)((NSArray *)userInfo[@"messages"]).count;
             if(numOfMessages == 0){
-                NSLog(@"メッセージの個数がゼロ");
+                NSLog(@"tableview : メッセージの個数がゼロ");
             }else{
+                NSLog(@"tableview : メッセージの内容は以下の通りです");
                 for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
+                    NSString *strMessage = userInfo[@"messages"][iMsg][@"message"];
+                    NSLog(@"message %d = %@", iMsg, strMessage);
                     
+                    
+                    //メッセージの内容をデバイスに格納して、後で表示させる必要がある。
+                    [self addMessageObj:userInfo[@"messages"][iMsg]];
                 }
             }
             
@@ -214,7 +225,7 @@
             
             
             //メッセージがあれば内容をデバイスに一時的に保存してタイムラインに移動
-            NSLog(@"receivemessage = %@", userInfo);
+            NSLog(@"tableview : receivemessage = %@", userInfo);
                   
                   
             //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
@@ -226,6 +237,90 @@
     
 }
 
+//最悪、ここはできなくてもよい
+//入力：msgInfo(account_id, id, message, time_line_id):メッセージ情報
+-(void)addMessageObj:(NSDictionary *)msgInfo{
+    return;//テスト：以下本番では作る必要あり(時間なかったので後回し)
+    //機能１
+    //user情報にmessageObjを紐づける
+    //既存のuserInfo
+    //"account_id" = taro;
+    //name = TARO;
+    //上記のuserInfoに対して以下のメッセージ配列を作成する
+    //message = {{account_id, id, message, time_line_id}, {...}, ...}みたいな感じで追加していく
+    
+    
+    //機能２
+    //user情報がなければaccount_id, nameを作成した上で上記と同じデータ構造でuserInfoを作成する
+    
+    
+    //メッセージ情報からアカウントを把握
+    NSString *strAccountId = msgInfo[@"account_id"];
+    
+    
+    
+    //既存のarrIndivisualIdに上記メッセージ配列を追加する
+    for(int i = 0;i < arrIndivisualId.count;i++){
+        //メッセージ情報から取得したアカウントが格納されていれば
+        if(arrIndivisualId[i][strAccountId] != nil &&
+           [arrIndivisualId[i][strAccountId] isEqual:[NSNull null]]){
+            //既にメッセージ配列の部分に何かしらのオブジェクトが格納されていれば
+            if(arrIndivisualId[i][@"messages"] != nil &&
+               [arrIndivisualId[i][@"messages"] isEqual:[NSNull null]]){
+                
+                //メッセージ配列に格納されているオブジェクトが配列型かどうか
+                if([arrIndivisualId[i][@"messages"] isKindOfClass:[NSMutableArray class]]){
+//                   [arrIndivisualId[i][@"messages"] isKindOfClass:[NSArray class]]){
+                   
+//                    for(int j = 0;j < ((NSMutableArray *)arrIndivisualId[i][@"messages"]).count;j++){
+//                        
+//                    }
+                    
+                    //最後にメッセージオブジェクトを追加する
+//                    NSMutableArray *mArrMsgInfo = arrIndivisualId[i][@"messages"];
+                    [arrIndivisualId[i][@"messages"] addObject:msgInfo];
+                    
+                }else{
+                    NSLog(@"クリティカルエラー：arrIndivisualIdが配列ではない別のオブジェクトが格納されています。");
+                }
+                
+            }else{
+                //メッセージ配列を新規作成して追加する
+                NSMutableArray *mArrMsgInfo = [NSMutableArray array];
+                [mArrMsgInfo addObject:msgInfo];
+                arrIndivisualId[i][@"messages"] = mArrMsgInfo;
+                mArrMsgInfo = nil;
+                
+                NSLog(@"メッセージ情報を新規追加 : arrIndivisualId = %@", arrIndivisualId);
+            }
+            
+            //[commonAPIでデバイスsetする]
+            [CommonAPI setIdArray:arrIndivisualId];
+            
+            [self.tableView reloadData];
+        }else{//メッセージ情報から取得したアカウントが格納されていない場合はそれを新たに作成してデバイスに保存する
+            NSMutableDictionary *dictUserInfo = [NSMutableDictionary dictionary];
+            dictUserInfo[@"account_id"] = strAccountId;
+//            dictUserInfo[@"name"]
+            //ここでnameをfinduserから取得してしまうと非同期処理が開始されてしまい、本スレッドで仮に複数のメッセージが存在した場合
+            //同一account_idで重複してしまう
+            
+            arrIndivisualId[i][@"messages"] = [NSMutableArray array];
+            [((NSMutableArray *)arrIndivisualId[i][@"messages"]) addObject:dictUserInfo];
+            
+//            [arrIndivisualId[i][@"messages"] addObject:dictUserInfo];
+            
+//            [CommonAPI setIdArray:<#(NSArray *)#>]
+            
+        }
+        
+        
+    }//for(i-arrIndivisualId.count)
+    
+    //呼び出すときから考えてやらなければいけない。
+    
+}
+
 //-(void)closeSoftKeyboard{
 //    [self.view endEditing:YES];
 //}
@@ -233,6 +328,7 @@
 -(void)edit{
     NSLog(@"編集中...");
     [timer invalidate];
+    NSLog(@"tableview : タイマーを停止");
     EditProfileTableViewController *vc = [[EditProfileTableViewController alloc]init];
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -401,6 +497,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
      completion:^(NSDictionary *userInfo,
                   NSURLSessionDataTask *task,
                   NSError *error){
+         
          NSLog(@"userinfo = %@", userInfo);
 //         NSLog(@"succeed = %@ : %@", userInfo[@"succeed"], [userInfo[@"succeed"] class]);//1:BOOL
          if(userInfo == nil || [userInfo isEqual:[NSNull null]]){
@@ -527,7 +624,10 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
               (int)indexPath.row,
               arrIndivisualId[indexPath.row]);
 //        cell.textLabel.text = arrIndivisualId[indexPath.row];//ID
-        cell.textLabel.text = arrIndivisualId[indexPath.row][@"account_id"];
+        cell.textLabel.text =
+        [NSString stringWithFormat:@"%@(%@)",
+         arrIndivisualId[indexPath.row][@"account_id"],
+         arrIndivisualId[indexPath.row][@"timeLineId"]];
         NSLog(@"aaa %i, %i",
               indexPath.section,
               indexPath.row);
@@ -602,8 +702,11 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
         
         //タイマーを無効にする
         [timer invalidate];
-        
+        NSLog(@"tableview : タイマーを停止");
+        //本番
         JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
+//        JSQDemo2ViewController *vc = [JSQDemo2ViewController messagesViewController];
+        
 //postするときに必要なデータ
 //        device_key	string          Required. Device Key that was issued when you create the user.
 //        time_line_id	string          Required for the time line. The ID of the time line.
@@ -628,9 +731,14 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
          completion:^(NSDictionary *userInfo,
                      NSURLSessionDataTask *task,
                      NSError *error){
+             NSLog(@"userInfo at findusers at tableView : %@", userInfo);
              NSArray *arrUsers = [NSArray arrayWithObjects:userInfo[@"user"], nil];
              JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
              vc.arrTimeLineUsers = arrUsers;
+             //timeLineIdが発行されている場合は入力されている(未入力の場合はnil)
+             vc.strTimeLineId = arrIndivisualId[indexPath.row][@"timeLineId"];
+             [timer invalidate];
+             NSLog(@"tableview : タイマーを停止");
              NSLog(@"vc.timelineusers = %@", vc.arrTimeLineUsers);
              [self.navigationController pushViewController:vc animated:YES];
              arrUsers = nil;
