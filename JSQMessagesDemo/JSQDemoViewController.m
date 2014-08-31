@@ -30,9 +30,9 @@
 #import "DataConnect.h"
 
 
-static NSString * const kJSQDemoAvatarNameCook = @"じんぐうじ";//Tim Cook";
-static NSString * const kJSQDemoAvatarNameJobs = @"Jobs";
-static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
+//static NSString * const kJSQDemoAvatarNameCook = @"じんぐうじ";//Tim Cook";
+//static NSString * const kJSQDemoAvatarNameJobs = @"Jobs";
+//static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 
 
 @implementation JSQDemoViewController{
@@ -42,6 +42,8 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     float firstY;
     
     NameTableView *tableView;
+    
+    NSString *strDeviceKey;
 }
 
 //はじめて一対一で話をする時はtimeLineIdは存在しないのでヌルのまま
@@ -52,6 +54,16 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 @synthesize timerConversation;
 @synthesize arrTimeLineUsers;//messages/postに必要なtime_line_idとmembers(相手のaccount_idとnameの組合せ辞書を格納している配列)
 //time_line_idは新規の場合、nilで最初のポストで返りに新規idが付与される
+//構造的には以下のような感じ
+//(
+// {
+//     "account_id" = taro;
+//     name = TARO;
+// },
+// {
+//     "account_id" = jiro;
+//     name = JIRO;
+//)
 
 #pragma mark - Demo setup
 
@@ -64,12 +76,14 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
      */
     self.messages = [[NSMutableArray alloc] initWithObjects:
                      
-                     [[JSQMessage alloc] initWithText:@"できたよ！" sender:self.sender date:[NSDate distantPast]],
-                     [[JSQMessage alloc] initWithText:@"まじかよ！" sender:kJSQDemoAvatarNameWoz date:[NSDate distantPast]],
-                     [[JSQMessage alloc] initWithText:@"遠藤天才？" sender:self.sender date:[NSDate distantPast]],
-                     [[JSQMessage alloc] initWithText:@"次は神宮司さんからjsonを！" sender:kJSQDemoAvatarNameJobs date:[NSDate date]],
-                     [[JSQMessage alloc] initWithText:@"はよ" sender:kJSQDemoAvatarNameCook date:[NSDate date]],
-                     [[JSQMessage alloc] initWithText:@"遠藤です" sender:self.sender date:[NSDate date]],
+                     //test-data
+//                     [[JSQMessage alloc] initWithText:@"できたよ！" sender:self.sender date:[NSDate distantPast]],
+//                     [[JSQMessage alloc] initWithText:@"まじかよ！" sender:kJSQDemoAvatarNameWoz date:[NSDate distantPast]],
+//                     [[JSQMessage alloc] initWithText:@"遠藤天才？" sender:self.sender date:[NSDate distantPast]],
+//                     [[JSQMessage alloc] initWithText:@"次は神宮司さんからjsonを！" sender:kJSQDemoAvatarNameJobs date:[NSDate date]],
+//                     [[JSQMessage alloc] initWithText:@"はよ" sender:kJSQDemoAvatarNameCook date:[NSDate date]],
+//                     [[JSQMessage alloc] initWithText:@"遠藤です" sender:self.sender date:[NSDate date]],
+                     //test-data2
 //                     [[JSQMessage alloc] initWithText:@"Welcome to JSQMessages: A messaging UI framework for iOS." sender:self.sender date:[NSDate distantPast]],
 //                     [[JSQMessage alloc] initWithText:@"It is simple, elegant, and easy to use. There are super sweet default settings, but you can customize like crazy." sender:kJSQDemoAvatarNameWoz date:[NSDate distantPast]],
 //                     [[JSQMessage alloc] initWithText:@"It even has data detectors. You can call me tonight. My cell number is 123-456-7890. My website is www.hexedbits.com." sender:self.sender date:[NSDate distantPast]],
@@ -85,28 +99,44 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
      *
      *  If you are not using avatars, ignore this.
      */
+    //自分のアイコンの直径
     CGFloat outgoingDiameter = self.collectionView.collectionViewLayout.outgoingAvatarViewSize.width;
     
+    //自分のアイコンイメージ
     UIImage *jsqImage = [JSQMessagesAvatarFactory avatarWithUserInitials:@"JSQ"
                                                          backgroundColor:[UIColor colorWithWhite:0.85f alpha:1.0f]
                                                                textColor:[UIColor colorWithWhite:0.60f alpha:1.0f]
                                                                     font:[UIFont systemFontOfSize:14.0f]
                                                                 diameter:outgoingDiameter];
     
+    //相手のアイコンの直径
     CGFloat incomingDiameter = self.collectionView.collectionViewLayout.incomingAvatarViewSize.width;
     
-    UIImage *cookImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"jin1"]//demo_avatar_cook"]
+    //相手のアイコンイメージ
+    UIImage *otherUser = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"takkun"]
                                                           diameter:incomingDiameter];
     
-    UIImage *jobsImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"takkun"]//demo_avatar_jobs"]
-                                                          diameter:incomingDiameter];
     
-    UIImage *wozImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"tanaka"]//demo_avatar_woz"]
-                                                         diameter:incomingDiameter];
-    self.avatars = @{ self.sender : jsqImage,
-                      kJSQDemoAvatarNameCook : cookImage,
-                      kJSQDemoAvatarNameJobs : jobsImage,
-                      kJSQDemoAvatarNameWoz : wozImage };
+    
+//    UIImage *cookImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"jin1"]//demo_avatar_cook"]
+//                                                          diameter:incomingDiameter];
+//    
+//    UIImage *jobsImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"takkun"]//demo_avatar_jobs"]
+//                                                          diameter:incomingDiameter];
+//    
+//    UIImage *wozImage = [JSQMessagesAvatarFactory avatarWithImage:[UIImage imageNamed:@"tanaka"]//demo_avatar_woz"]
+//                                                         diameter:incomingDiameter];
+    
+//    self.avatars = @{ self.sender : jsqImage,
+//                      kJSQDemoAvatarNameCook : cookImage,
+//                      kJSQDemoAvatarNameJobs : jobsImage,
+//                      kJSQDemoAvatarNameWoz : wozImage };
+    self.avatars = @{self.sender : jsqImage
+                     ,self.arrTimeLineUsers[0][@"account_id"] : otherUser
+//                     ,self.arrTimeLineUsers[1][@"account_id"] : otherUser
+//                     ,...
+                     };
+    
     
     /**
      *  Change to add more messages for testing
@@ -121,11 +151,13 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
      *  Change to YES to add a super long message for testing
      *  You should see "END" twice
      */
-    BOOL addREALLYLongMessage = YES;
+    BOOL addREALLYLongMessage = NO;
     if (addREALLYLongMessage) {
         JSQMessage *reallyLongMessage = [JSQMessage messageWithText:@"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? END Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? END" sender:self.sender];
         [self.messages addObject:reallyLongMessage];
     }
+    
+    
 }
 
 
@@ -152,6 +184,9 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     [super viewDidLoad];
     
     NSLog(@"timeLineUsers = %@", self.arrTimeLineUsers);
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+    strDeviceKey = store[@"device_key"];
+    store = nil;
     
     self.title = @"base time line";
     
@@ -190,7 +225,7 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 //    self.navigationItem.leftBarButtonItem = barLeftButtonItem;
     
     
-//    [self setupTestModel];
+    [self setupTestModel];
     
     /**
      *  Remove camera button since media messages are not yet implemented
@@ -248,6 +283,92 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
 -(void)checkMessage:(NSTimer *)timer{
     NSLog(@"checkmessage");
     
+//    if(self.strTimeLineId != nil &&
+//       [self.strTimeLineId isEqual:[NSNull null]]){
+    
+    
+        
+        [[DataConnect sharedClient]
+         receiveMessageToDeviceKey:strDeviceKey
+         timeLineId:self.strTimeLineId
+         completion:^(NSDictionary *userInfo,
+                      NSURLSessionDataTask *task,
+                      NSError *error){
+             if([userInfo[@"succeed"] integerValue] != 1){
+                 NSLog(@"succeed != 1");
+                 [self dispSendError:1];
+                 return;
+             }else {
+//                 NSLog(@"receiveMessage : userinfo=%@", userInfo);
+                 if(userInfo == nil ||
+                    [userInfo isEqual:[NSNull null]]){
+                     [self dispSendError:0];
+                     return;
+                 }else if([userInfo[@"succeed"] intValue] == 1){
+//                     NSLog(@"メッセージ受信のためにサーバと通信しました");
+                     
+//                 {
+//                     "succeed": true,
+//                     "messages": [
+//                          {
+//                              "id": "20",
+//                              "account_id": "momoca",
+//                              "time_line_id": "16",
+//                              "message": "Hello, everyone."
+//                              "created": "2014-08-10 17:06:26"
+//                          }
+//                          {
+//                              "id": "21",
+//                              "account_id": "fasdfa",
+//                              "time_line_id": "16",
+//                              "message": "testtest"
+//                              "created": "2014-08-10 17:06:27"
+//                          }
+//                    ]
+//                 }
+                     
+                     NSArray *arrMessage = userInfo[@"messages"];
+                     for(int i = 0;i < arrMessage.count;i++){
+                         NSString *strAccountId = arrMessage[i][@"account_id"];
+                         NSLog(@"data = %@", [NSDate date]);
+                         
+                         
+                         JSQMessage *messageReceived =
+                         [[JSQMessage alloc]
+                          initWithText:arrMessage[i][@"message"]
+                          sender:strAccountId
+                          date:[NSDate date]];
+                         
+    //                     [self.messages addObject:messageReceived];
+    //                     [self finishSendingMessage];
+                         
+                     
+                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW,
+                                                      (int64_t)(1.0 * NSEC_PER_SEC)),
+                                        dispatch_get_main_queue(), ^{
+                             
+                            //既存のアバターのキー配列を取得
+    //                         NSMutableArray *copyAvatars = [[self.avatars allKeys] mutableCopy];
+    //                         [copyAvatars removeObject:self.sender];
+    //                         copyMessage.sender = [copyAvatars objectAtIndex:arc4random_uniform((int)[copyAvatars count])];
+                             
+                             /**
+                              *  This you should do upon receiving a message:
+                              *
+                              *  1. Play sound (optional)
+                              *  2. Add new id<JSQMessageData> object to your data source
+                              *  3. Call `finishReceivingMessage`
+                              */
+                             [JSQSystemSoundPlayer jsq_playMessageReceivedSound];
+                             [self.messages addObject:messageReceived];
+                             [self finishReceivingMessage];
+                             NSLog(@"message finished %d", i);
+                         });
+                     }
+                 }
+             }
+        }];
+//    }
 }
 
 -(void)back{
@@ -452,27 +573,22 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
     NSLog(@"didPressSendButton");
     
     [JSQSystemSoundPlayer jsq_playMessageSentSound];
-    
-    
-    
     JSQMessage *message = [[JSQMessage alloc] initWithText:text sender:sender date:date];
     
     
-    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
-    NSString *strDeviceKey = store[@"device_key"];
-//
-//    if(store[@"time_line_id"]){
-//        
-//        NSLog(@"time_line_id = %@", store[@"time_line_id"]);
-//        //return;
-//    }
+//    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+//    NSString *strDeviceKey = store[@"device_key"];
+//    store = nil;
+    
     //送り先配列の作成
     NSMutableArray *arrUserIdToSend = [NSMutableArray array];
     for(id userInfo in self.arrTimeLineUsers){
         [arrUserIdToSend addObject:userInfo[@"account_id"]];
     }
     
-    //あと、/messages/postの引数のmembersは普通に配列として投げてやれば受け取れるんですかね？
+    NSLog(@"deviceId:%@からtimielineid:%@でmember:%@にメッセージ%@を送信します",
+          strDeviceKey, self.strTimeLineId, arrUserIdToSend, text);
+    
     [[DataConnect sharedClient]
      sendMessage:text
      deviceKey:strDeviceKey
@@ -521,9 +637,84 @@ static NSString * const kJSQDemoAvatarNameWoz = @"Steve Wozniak";
              [self dispSendError:0];
              return;
          }else if([userInfo[@"succeed"] intValue] == 1){
+//             data-architecture
+//             {
+//                 "succeed": true,
+//                 "time_line": {
+//                     "id": "15",
+//                     "host_id": "95",
+//                     "name": "JIRO, TARO",
+//                     "members": [
+//                         {
+//                             "account_id": "jiro",
+//                             "name": "JIRO",
+//                             "id": "84"
+//                         },
+//                         {
+//                             "account_id": "taro",
+//                             "name": "TARO",
+//                             "id": "85"
+//                         }
+//                         ]
+//                 }
+//             }
+             
+             //問題は
+             //Idが発行されてないタイムラインで新規投稿した場合、受信側はそのメッセージが受信されない
+             //receivemessageで受信されない原因はaccount_idではなくタイムラインidでしか共有できていないため？
+             
+             //apiの仕様上の問題(お互いのタイムライン開いている時のtimelineid二重発行問題)はネイティブで解決
+             //apiで問題になっているところ
+             //1:投げたポストが受け取り側に送られていない(クリティカル)
+             //→ポストが投げられたタイムラインidをsequelで確認：送り先のaccount_id(は見えないがnameが正しい)を確認
+             //postが投げられたタイムラインは存在するが、メッセージの送信場所がstreamになっていることを確認すべき
+             //→確認できたが、送り先(receiver_id=92)が自分なのかどうかが不明
+             //→receiver_id＝９２が自分なのかどうか確認すべき=>apiから当該数値idが与えられていない。
+             //いっせいさんに言ってreceiver_idではなくaccount_idで表示してもらう対応策、もしくはcreateUserでreceiver_idを受け取るよう対応してもらうのいずれか必要
+             //simulatoracのreceiver_id=９２が正しいとして、メッセージを受け取れているか確認する
+             //messages/streamで受け取れているか確認：このapiは(B端末ではタイムラインidが取得できていないので無指定)device_keyのみでキックしているが、ここで受け取れているか
+             //messages/streamをするとネイティブ上ではメッセージが受け取れていない(message.count=0)が、DB上ではis_streamedが１になってしまっている
+             
+             
+             
+             //2:timelineの見方が不明なのだが、name欄に送信側と受信側のnameが表示されていない(現状送り手のみ表示されてる)のは問題なのか確認
+             
+             //timeLineIdが未発行の場合はデバイスに新規に保存させる必要がある！
+             //その場合、ここまでuserInfo[account_id, name, timeLineId]のtimeLineIdは未作成
+             //以下、グループチャットの場合は別に作成する必要がある(新規グループの場合はどんな変数が渡されてTL画面に遷移しているか未決定)かによって別途対応必要
+             //個人チャットの場合
+             if(self.arrTimeLineUsers.count == 1){
+                 //null判定しなくていいかも
+                 if(self.strTimeLineId == nil ||
+                    [self.strTimeLineId isEqual:[NSNull null]]){
+                     //初回ポストの場合、timelineid
+                     NSLog(@"初回ポストにつき、timelineidを保存開始");
+                     
+                     //このvc内でのタイムラインidを保存
+                     self.strTimeLineId = userInfo[@"time_line"][@"id"];
+                     
+                     //
+    //                 NSMutableDictionary *userInfo = [CommonAPI getIdArray];
+//                     NSMutableDictionary *userInfoInTimeLine = [self.arrTimeLineUsers[0] mutableCopy];
+//                     userInfoInTimeLine[@"timeLineId"] = userInfo[@"time_line"][@"id"];
+                     
+                     //個人ユーザー情報(にtimeLineIdを紐づけてやる)の取得
+                     NSString *strAccountId = self.arrTimeLineUsers[0][@"account_id"];//その人個人とのtimeLineIdをデバイスに保存
+                     //デバイスに保存(既存のユーザー情報を編集してtimelineidを保存)
+                     if([CommonAPI modifyTimeLineId:self.strTimeLineId
+                                           toUserId:strAccountId]){
+                         NSLog(@"タイムラインidの保存成功 : %@", self.strTimeLineId);
+                     }else{
+                         NSLog(@"タイムラインidの保存失敗 : %@", self.strTimeLineId);
+                     }
+                 }else{
+                     NSLog(@"初回ポストではないのでtimelineidを保存しない : %@", self.strTimeLineId);
+                 }
+             }
              NSLog(@"userinfo[succeed]=%d", [userInfo[@"succeed"] intValue]);
              [SVProgressHUD showSuccessWithStatus:@"送信しました!"];
              [SVProgressHUD showSuccessWithStatus:[NSString stringWithFormat:@"%@", userInfo]];
+             NSLog(@"userinfo = %@", userInfo);
              [self.messages addObject:message];
              [self finishSendingMessage];
          }else{

@@ -87,12 +87,33 @@
     }
 }
 
-//デバイスに保存されているdictUser配列の中にaccount_idのuserInfoが存在していればtrueを返す
+//既に保存されているaccount_idのユーザーとのタイムラインidを編集する
+//※新規にユーザーを追加した段階ではuserInfoの中にタイムラインidはnil(もしくはそんな項目すらない状態になっている？)
++(BOOL)modifyTimeLineId:(NSString *)argStrTimeLineId toUserId:(NSString *)argStrUserId{
+    NSMutableArray *arrUserInfo = [[self getIdArray] mutableCopy];
+    int noOfId = [self getNoOfId:argStrUserId];
+    if(noOfId != -1){
+        NSLog(@"before : userInfo = %@", arrUserInfo[noOfId]);
+//        arrUserInfo[noOfId][@"timeLineId"] = argStrTimeLineId;
+        NSMutableDictionary *userInfo = [arrUserInfo[noOfId] mutableCopy];
+        userInfo[@"timeLineId"] = argStrTimeLineId;
+        
+        arrUserInfo[noOfId] = userInfo;
+        NSLog(@"after : userInfo = %@", arrUserInfo[noOfId]);
+        
+        
+        [self setIdArray:(NSArray *)arrUserInfo];
+    }
+    
+    return false;
+}
+
+//デバイスに保存されているユーザー情報配列の中に指定したdictUserのaccount_idのuserInfoが存在していればtrueを返す
 +(BOOL)containsObject:(NSDictionary *)dictUser{
     NSMutableArray *arrayInDevice = [[self getIdArray] mutableCopy];
     for(NSDictionary *dictInDevice in arrayInDevice){
-        NSLog(@"account_id = %@", dictUser[@"account_id"]);
-        NSLog(@"dictInDevice = %@", dictInDevice);
+//        NSLog(@"account_id = %@", dictUser[@"account_id"]);
+//        NSLog(@"dictInDevice = %@", dictInDevice);
         if(  dictUser[@"account_id"] != nil &&
            ![dictUser[@"account_id"] isEqual:[NSNull null]] &&
             dictInDevice != nil &&
@@ -101,11 +122,23 @@
             if([dictInDevice[@"account_id"] isEqualToString:dictUser[@"account_id"]]){
                 return true;
             }
-        }else{
-            NSLog(@"aaaaaaa");
         }
     }
     return false;
+}
+
+//デバイスに保存されているユーザー情報配列の中にaccount_idのuserInfoが存在していればtrueを返す
++(int)getNoOfId:(NSString *)strId{
+    NSArray *arrayInDevice = [self getIdArray];
+//    for(NSDictionary *userInfo in arrayInDevice){
+    for(int numberInArray = 0;numberInArray < arrayInDevice.count;numberInArray++){
+//        if([userInfo[@"account_id"] isEqualToString:strId]){
+        if([arrayInDevice[numberInArray][@"account_id"] isEqualToString:strId]){
+            return numberInArray;
+        }
+    }
+    
+    return -1;
 }
 
 ////デバイスに保存されているグループIDを取得して返す

@@ -19,6 +19,7 @@
 #import <UIKit/UIKit.h>
 
 #import "JSQDemoViewController.h"
+#import "JSQDemo2ViewController.h"
 
 @interface JSQTableViewController : UITableViewController
 <
