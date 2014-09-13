@@ -236,6 +236,7 @@
         completion:^(NSDictionary *userInfo,
                      NSURLSessionDataTask *task,
                      NSError *error){
+            NSLog(@"userInfo = %@", userInfo);
             //データ通信中なので通信可能状態に設定
             isConnectMode = YES;
             
@@ -257,17 +258,21 @@
             }else{
                 NSLog(@"tableview : メッセージの内容は以下の通りです");
                 for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
-                    NSLog(@"message info %d = %@", iMsg, userInfo[@"messges"][iMsg]);
-                    NSString *strMessage = userInfo[@"messages"][iMsg][@"message"];
-                    NSLog(@"message %d = %@", iMsg, strMessage);
+                    NSLog(@"message info %d = %@", iMsg, userInfo[@"messages"][iMsg]);
+//                    NSString *strMessage = userInfo[@"messages"][iMsg][@"message"];
+//                    NSLog(@"message %d = %@", iMsg, strMessage);
                     
                     
                     //メッセージの内容をデバイスに格納して、後で表示させる必要がある。
                     [self addMessageObj:userInfo[@"messages"][iMsg]];
                     
-                    
+                    //タイムライン上でメッセージを受信した時に表示する通知メッセージ
+                    NSString *strDispNotification =
+                    [NSString stringWithFormat:@"%@:%@",
+                     userInfo[@"messages"][iMsg][@"account_id"],
+                     userInfo[@"messages"][iMsg][@"message"]];
                     //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
-                    [self receiveMessageView:(NSString *)strMessage];
+                    [self receiveMessageView:strDispNotification];
                 }
             }
             
