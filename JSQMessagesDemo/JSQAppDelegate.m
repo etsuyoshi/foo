@@ -17,6 +17,7 @@
 //
 
 #import "JSQAppDelegate.h"
+#import <Crashlytics/Crashlytics.h>
 
 @implementation JSQAppDelegate
 
@@ -24,7 +25,7 @@
 //device_key、name、account_idをサーバーから取得してデバイス側に保存されている組み合わせが正しいか確認する
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    
+    [Crashlytics startWithAPIKey:@"844ba808bc3843aa81b356efa4ceed91088c1e57"];
     return YES;
 }
 

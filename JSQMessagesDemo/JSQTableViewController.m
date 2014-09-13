@@ -41,6 +41,8 @@
     BOOL isConnectMode;
     
     
+    UILabel *labelMessageReceive;
+    
     //キーボード関連
 //    UIView *viewTable;
 //    UIView *viewForm;
@@ -161,6 +163,16 @@
 //    [self.view addGestureRecognizer:gestureRecognizer];
 }
 
+-(void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    
+    //example
+//    [self receiveMessageView];
+    
+    
+    
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -170,6 +182,39 @@
     
     NSLog(@"finish viewwillappear");
 }
+
+-(void)receiveMessageView:(NSString *)_strMessage{
+    
+    labelMessageReceive =
+    [[UILabel alloc]
+     initWithFrame:
+     CGRectMake(0, 0,
+                self.view.bounds.size.width,
+                50)];
+    labelMessageReceive.backgroundColor =
+    [[UIColor greenColor] colorWithAlphaComponent:0.9f];
+    labelMessageReceive.text = _strMessage;
+    labelMessageReceive.textColor = [UIColor whiteColor];
+    [self.view addSubview:labelMessageReceive];
+    
+    //時間遅れ
+    [self performSelector:@selector(removeMessageView)
+               withObject:nil
+               afterDelay:1.0];
+}
+
+//メッセージを受信したとき
+-(void)removeMessageView{
+    [UIView
+     animateWithDuration:0.5f
+     animations:^{
+         labelMessageReceive.alpha = 0.0f;
+     }
+     completion:^(BOOL finished){
+         [labelMessageReceive removeFromSuperview];
+     }];
+}
+
 
 -(void)checkMessage:(NSTimer *)timer{
     NSLog(@"checkMessage");
@@ -212,12 +257,17 @@
             }else{
                 NSLog(@"tableview : メッセージの内容は以下の通りです");
                 for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
+                    NSLog(@"message info %d = %@", iMsg, userInfo[@"messges"][iMsg]);
                     NSString *strMessage = userInfo[@"messages"][iMsg][@"message"];
                     NSLog(@"message %d = %@", iMsg, strMessage);
                     
                     
                     //メッセージの内容をデバイスに格納して、後で表示させる必要がある。
                     [self addMessageObj:userInfo[@"messages"][iMsg]];
+                    
+                    
+                    //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
+                    [self receiveMessageView:(NSString *)strMessage];
                 }
             }
             
@@ -227,8 +277,6 @@
             //メッセージがあれば内容をデバイスに一時的に保存してタイムラインに移動
             NSLog(@"tableview : receivemessage = %@", userInfo);
                   
-                  
-            //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
             
             
             
@@ -733,11 +781,12 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
                      NSError *error){
              NSLog(@"userInfo at findusers at tableView : %@", userInfo);
              NSArray *arrUsers = [NSArray arrayWithObjects:userInfo[@"user"], nil];
+             NSLog(@"arrUsers.count = %d, contents = %@", (int)arrUsers.count, arrUsers);
              JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
              vc.arrTimeLineUsers = arrUsers;
              //timeLineIdが発行されている場合は入力されている(未入力の場合はnil)
              vc.strTimeLineId = arrIndivisualId[indexPath.row][@"timeLineId"];
-             [timer invalidate];
+             [timer invalidate];//タイマー停止
              NSLog(@"tableview : タイマーを停止");
              NSLog(@"vc.timelineusers = %@", vc.arrTimeLineUsers);
              [self.navigationController pushViewController:vc animated:YES];

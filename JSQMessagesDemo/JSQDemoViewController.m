@@ -131,6 +131,14 @@
 //                      kJSQDemoAvatarNameCook : cookImage,
 //                      kJSQDemoAvatarNameJobs : jobsImage,
 //                      kJSQDemoAvatarNameWoz : wozImage };
+    NSLog(@"相手の人数 = %d", (int)self.arrTimeLineUsers.count);
+    NSLog(@"\nselfsender = %@,\n jsqImage = %@,\n selfarrTimeLineUsers[0][accountid]=%@,\n otherUser = %@",
+          self.sender,
+          jsqImage,
+          self.arrTimeLineUsers,//[0][@"account_id"],
+//          @"aaa",
+          otherUser
+          );
     self.avatars = @{self.sender : jsqImage
                      ,self.arrTimeLineUsers[0][@"account_id"] : otherUser
 //                     ,self.arrTimeLineUsers[1][@"account_id"] : otherUser
@@ -287,13 +295,19 @@
 //       [self.strTimeLineId isEqual:[NSNull null]]){
     
     
-        
-        [[DataConnect sharedClient]
-         receiveMessageToDeviceKey:strDeviceKey
-         timeLineId:self.strTimeLineId
-         completion:^(NSDictionary *userInfo,
-                      NSURLSessionDataTask *task,
-                      NSError *error){
+    
+    //20140901:self.strTimeLineIdに現在のタイムラインと異なるidでは受信できないかもしれない
+    //→self.strTimeLineIdがnullで受け取るようにする
+    [[DataConnect sharedClient]
+     receiveMessageToDeviceKey:strDeviceKey
+     timeLineId:nil//self.strTimeLineId
+     completion:^(NSDictionary *userInfo,
+                  NSURLSessionDataTask *task,
+                  NSError *error){
+         
+         NSLog(@"tableview : message = %@", userInfo[@"messages"]);
+         
+         
              if([userInfo[@"succeed"] integerValue] != 1){
                  NSLog(@"succeed != 1");
                  [self dispSendError:1];
@@ -342,7 +356,7 @@
     //                     [self.messages addObject:messageReceived];
     //                     [self finishSendingMessage];
                          
-                     
+                         
                          dispatch_after(dispatch_time(DISPATCH_TIME_NOW,
                                                       (int64_t)(1.0 * NSEC_PER_SEC)),
                                         dispatch_get_main_queue(), ^{
