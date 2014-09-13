@@ -10,6 +10,7 @@
 		2A23FF94199DB0BF009BA3CD /* PersonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A23FF93199DB0BF009BA3CD /* PersonViewController.m */; };
 		2A23FF97199DD997009BA3CD /* DataConnect.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A23FF95199DD997009BA3CD /* DataConnect.m */; };
 		2A23FF9A199F3993009BA3CD /* EditProfileTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A23FF99199F3993009BA3CD /* EditProfileTableViewController.m */; };
+		2A59E0EF19C3486300F5F4C0 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A59E0EE19C3486300F5F4C0 /* Crashlytics.framework */; };
 		2A7A7E9E19814357004869D1 /* BSSellerAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7A7E9B19814357004869D1 /* BSSellerAPIClient.m */; };
 		2A7A7E9F19814357004869D1 /* BSUserManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7A7E9D19814357004869D1 /* BSUserManager.m */; };
 		2A81A642199FF89800C7E7E1 /* CommonAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A81A641199FF89800C7E7E1 /* CommonAPI.m */; };
@@ -129,6 +130,7 @@
 		2A23FF96199DD997009BA3CD /* DataConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataConnect.h; sourceTree = SOURCE_ROOT; };
 		2A23FF98199F3993009BA3CD /* EditProfileTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EditProfileTableViewController.h; path = JSQMessagesDemo/EditProfileTableViewController.h; sourceTree = SOURCE_ROOT; };
 		2A23FF99199F3993009BA3CD /* EditProfileTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EditProfileTableViewController.m; path = JSQMessagesDemo/EditProfileTableViewController.m; sourceTree = SOURCE_ROOT; };
+		2A59E0EE19C3486300F5F4C0 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		2A7A7E9A19814357004869D1 /* BSSellerAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSSellerAPIClient.h; sourceTree = SOURCE_ROOT; };
 		2A7A7E9B19814357004869D1 /* BSSellerAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BSSellerAPIClient.m; sourceTree = SOURCE_ROOT; };
 		2A7A7E9C19814357004869D1 /* BSUserManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSUserManager.h; sourceTree = SOURCE_ROOT; };
@@ -279,6 +281,7 @@
 				885D592F18CBD13D00D77BB3 /* CoreGraphics.framework in Frameworks */,
 				885D593118CBD13D00D77BB3 /* UIKit.framework in Frameworks */,
 				885D592D18CBD13D00D77BB3 /* Foundation.framework in Frameworks */,
+				2A59E0EF19C3486300F5F4C0 /* Crashlytics.framework in Frameworks */,
 				C78CEF093F584B85B4321C83 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -518,6 +521,7 @@
 		885D592B18CBD13D00D77BB3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2A59E0EE19C3486300F5F4C0 /* Crashlytics.framework */,
 				885D592E18CBD13D00D77BB3 /* CoreGraphics.framework */,
 				885D592C18CBD13D00D77BB3 /* Foundation.framework */,
 				343577012CC24261BE4B61A1 /* libPods.a */,
@@ -664,6 +668,7 @@
 				885D592618CBD13D00D77BB3 /* Frameworks */,
 				885D592718CBD13D00D77BB3 /* Resources */,
 				7FD13EFACBFC4055895E51E4 /* Copy Pods Resources */,
+				2A59E0ED19C3484200F5F4C0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -708,6 +713,7 @@
 						DevelopmentTeam = 8ZAC8P584F;
 					};
 					885D594C18CBD13D00D77BB3 = {
+						DevelopmentTeam = 8ZAC8P584F;
 						TestTargetID = 885D592818CBD13D00D77BB3;
 					};
 				};
@@ -795,6 +801,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Pods-JSQMessagesTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		2A59E0ED19C3484200F5F4C0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./Crashlytics.framework/run 844ba808bc3843aa81b356efa4ceed91088c1e57 0615ac0a803a354fa232a8dbca1256fa02e462d11fd94366ed4a4f3339997140";
 		};
 		5AF0226F94CF4DE999772A5D /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1041,6 +1060,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "JSQMessagesDemo/JSQMessages-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/JSQMessagesDemo/JSQMessages-Info.plist";
@@ -1060,6 +1083,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "JSQMessagesDemo/JSQMessages-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/JSQMessagesDemo/JSQMessages-Info.plist";
@@ -1076,6 +1103,8 @@
 			baseConfigurationReference = F97EDB6B43814A9BADBA4B25 /* Pods-JSQMessagesTests.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/JSQMessages.app/JSQMessages";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -1089,6 +1118,7 @@
 				);
 				INFOPLIST_FILE = "JSQMessagesTests/JSQMessagesTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -1099,6 +1129,8 @@
 			baseConfigurationReference = F97EDB6B43814A9BADBA4B25 /* Pods-JSQMessagesTests.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/JSQMessages.app/JSQMessages";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -1108,6 +1140,7 @@
 				GCC_PREFIX_HEADER = "JSQMessagesDemo/JSQMessages-Prefix.pch";
 				INFOPLIST_FILE = "JSQMessagesTests/JSQMessagesTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};

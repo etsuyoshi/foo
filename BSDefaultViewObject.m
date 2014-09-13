@@ -60,8 +60,8 @@ static UIImageView *backgroundImageView = nil;
     //反社チェック用
     //return @"http://api.upbase.info";
     
-    return @"http://54.92.88.238";
-    
+//    return @"http://54.92.88.238";
+    return @"http://api.getpopchat.com";// /";
 }
 
 + (BOOL)isMoreIos7{

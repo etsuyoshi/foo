@@ -199,7 +199,6 @@
             parameters[@"name"] = name;
             NSLog(@"nameを%@に設定します", name);
         }
-        
         if(accountId != nil && ![accountId isEqual:[NSNull null]]){
             parameters[@"account_id"] = accountId;
             NSLog(@"account_idを%@に設定します", accountId);
