@@ -236,6 +236,7 @@
         completion:^(NSDictionary *userInfo,
                      NSURLSessionDataTask *task,
                      NSError *error){
+            NSLog(@"userInfo = %@", userInfo);
             //データ通信中なので通信可能状態に設定
             isConnectMode = YES;
             
@@ -257,17 +258,21 @@
             }else{
                 NSLog(@"tableview : メッセージの内容は以下の通りです");
                 for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
-                    NSLog(@"message info %d = %@", iMsg, userInfo[@"messges"][iMsg]);
-                    NSString *strMessage = userInfo[@"messages"][iMsg][@"message"];
-                    NSLog(@"message %d = %@", iMsg, strMessage);
+                    NSLog(@"message info %d = %@", iMsg, userInfo[@"messages"][iMsg]);
+//                    NSString *strMessage = userInfo[@"messages"][iMsg][@"message"];
+//                    NSLog(@"message %d = %@", iMsg, strMessage);
                     
                     
                     //メッセージの内容をデバイスに格納して、後で表示させる必要がある。
                     [self addMessageObj:userInfo[@"messages"][iMsg]];
                     
-                    
+                    //タイムライン上でメッセージを受信した時に表示する通知メッセージ
+                    NSString *strDispNotification =
+                    [NSString stringWithFormat:@"%@:%@",
+                     userInfo[@"messages"][iMsg][@"account_id"],
+                     userInfo[@"messages"][iMsg][@"message"]];
                     //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
-                    [self receiveMessageView:(NSString *)strMessage];
+                    [self receiveMessageView:strDispNotification];
                 }
             }
             
@@ -773,6 +778,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
         //遷移先に送る為のaccount_idとnameの組み合わせを作成するため
 //        NSString *strAccountId = arrIndivisualId[indexPath.row];
         NSString *strAccountId = arrIndivisualId[indexPath.row][@"account_id"];
+        NSLog(@"選択画面で%@が選択されました", strAccountId);
         [[DataConnect sharedClient]
          findUserWithDeviceKey:strDeviceKey
          accountId:strAccountId
@@ -782,15 +788,26 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
              NSLog(@"userInfo at findusers at tableView : %@", userInfo);
              NSArray *arrUsers = [NSArray arrayWithObjects:userInfo[@"user"], nil];
              NSLog(@"arrUsers.count = %d, contents = %@", (int)arrUsers.count, arrUsers);
-             JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
-             vc.arrTimeLineUsers = arrUsers;
-             //timeLineIdが発行されている場合は入力されている(未入力の場合はnil)
-             vc.strTimeLineId = arrIndivisualId[indexPath.row][@"timeLineId"];
-             [timer invalidate];//タイマー停止
-             NSLog(@"tableview : タイマーを停止");
-             NSLog(@"vc.timelineusers = %@", vc.arrTimeLineUsers);
-             [self.navigationController pushViewController:vc animated:YES];
+             //該当者が存在すれば
+             if((int)arrUsers.count > 0){
+                 JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
+                 vc.arrTimeLineUsers = arrUsers;
+                 //timeLineIdが発行されている場合は入力されている(未入力の場合はnil)
+                 vc.strTimeLineId = arrIndivisualId[indexPath.row][@"timeLineId"];
+                 [timer invalidate];//タイマー停止
+                 NSLog(@"tableview : タイマーを停止");
+                 NSLog(@"vc.timelineusers = %@", vc.arrTimeLineUsers);
+                 [self.navigationController pushViewController:vc animated:YES];
+                 
+             }else{
+                 //該当者が存在しない
+                 NSString *strNoManMessage =
+                 [NSString stringWithFormat:@"%@が存在しません", strAccountId];
+                 NSLog(@"%@", strNoManMessage);
+                 [SVProgressHUD showSuccessWithStatus:strNoManMessage];
+             }
              arrUsers = nil;
+             NSLog(@"arrUsers初期化");
          }];
         store = nil;
     }
