@@ -15,6 +15,7 @@
 +(NSArray *)getIdArray;
 +(BOOL)addId:(NSString *)strId;
 +(NSString *)getIdNoAt:(int)no;
++(BOOL)findId:(NSString *)strId;
 //+(NSArray *)initArrayGroupId;
 +(BOOL)modifyTimeLineId:(NSString *)argStrTimeLineId toUserId:(NSString *)argStrUserId;
 +(BOOL)addMessage:(NSDictionary*)dictUser;
