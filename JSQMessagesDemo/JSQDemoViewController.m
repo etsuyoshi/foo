@@ -67,13 +67,43 @@
 
 #pragma mark - Demo setup
 
-- (void)setupTestModel
+- (void)initialize
 {
     /**
      *  Load some fake messages for demo.
      *
      *  You should have a mutable array or orderedSet, or something.
      */
+    
+    
+    //①commonAPIからgetMessageArrayで当該タイムライン(個人の場合はaccount_idが等しいもの)のみ抽出
+    //②抽出したら以下のself.messagesにメッセージを格納
+    //③(次回以降同じメッセージを表示しないよう)格納したらdeleteMessageArrayで当該メッセージオブジェクト自体を削除する
+    /*
+     ①②③
+     ここに書く！！！！！！！！！！！！！！
+     */
+     //①
+    NSMutableArray *arrMessage = [[CommonAPI getMessageArray] mutableCopy];
+    for(int i =0;i < arrMessage.count;i++){
+        NSLog(@"initializer : %d : %@", i, arrMessage[i]);
+        
+        //既に格納されているタイムラインユーザーとの照合
+        for(int j = 0;j < self.arrTimeLineUsers.count;j++){
+            
+            if([arrMessage[i][@"account_id"] isEqualToString:self.arrTimeLineUsers[j][@"account_id"] ]){
+                //↑正しいか分からない
+                NSLog(@"照合！！！！");
+            }
+        }
+    }
+    
+    
+    //②
+    
+    
+    //③
+    
     self.messages = [[NSMutableArray alloc] initWithObjects:
                      
                      //test-data
@@ -198,7 +228,7 @@
     
     self.title = @"base time line";
     
-    self.sender = @"Jesse Squires";
+    self.sender = @"myself defined in view didload";
     
 //    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
 //    
@@ -233,7 +263,7 @@
 //    self.navigationItem.leftBarButtonItem = barLeftButtonItem;
     
     
-    [self setupTestModel];
+    [self initialize];
     
     /**
      *  Remove camera button since media messages are not yet implemented

@@ -76,7 +76,7 @@
     arrTmp = nil;
     
     //if([arrId containsObject:strId]){
-    if([self containsObject:dictUser]){
+    if([self containsIdArray:dictUser]){
         NSLog(@"重複しているので追加しません。");
         return false;
     }else{
@@ -109,7 +109,7 @@
 }
 
 //デバイスに保存されているユーザー情報配列の中に指定したdictUserのaccount_idのuserInfoが存在していればtrueを返す
-+(BOOL)containsObject:(NSDictionary *)dictUser{
++(BOOL)containsIdArray:(NSDictionary *)dictUser{
     NSMutableArray *arrayInDevice = [[self getIdArray] mutableCopy];
     for(NSDictionary *dictInDevice in arrayInDevice){
 //        NSLog(@"account_id = %@", dictUser[@"account_id"]);
@@ -148,6 +148,60 @@
 //    
 //}
 
+
+
++(NSArray *)getMessageArray{
+    NSLog(@"getIdarray");
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+    
+    NSData *dataReturn = [store dataForKey:@"array_message"];
+    
+    // 変換前のオブジェクトに復元(デコード)
+    NSArray *arrayReturn = [NSKeyedUnarchiver unarchiveObjectWithData:dataReturn];
+    
+    
+    if(arrayReturn == nil ||
+       [arrayReturn isEqual:[NSNull null]]){
+        arrayReturn = [NSMutableArray array];
+    }
+    
+    store = nil;
+    return arrayReturn;
+}
+
+//指定されたIDを配列に格納してデバイスに保存
++(BOOL)addMessage:(NSDictionary*)dictUser{
+    
+    NSArray *arrTmp = [CommonAPI getIdArray];
+    
+    if(arrTmp == nil || [arrTmp isEqual:[NSNull null]]){
+        arrTmp = [NSArray array];
+    }
+    NSMutableArray *arrMessage = [arrTmp mutableCopy];
+    arrTmp = nil;
+    
+    
+    NSLog(@"追加 : dictUser = %@", dictUser);
+    [arrMessage addObject:dictUser];
+    [CommonAPI setIdArray:arrMessage];
+    return true;//特に意味はない
+}
+
+
++(BOOL)deleteMessage:(int)no{
+    NSArray *arrTmp = [CommonAPI getIdArray];
+    
+    if(arrTmp == nil || [arrTmp isEqual:[NSNull null]]){
+        arrTmp = [NSArray array];
+    }
+    NSMutableArray *arrMessage = [arrTmp mutableCopy];
+    arrTmp = nil;
+    
+    [arrMessage removeObjectAtIndex:no];
+    [CommonAPI setIdArray:arrMessage];
+    return true;
+    
+}
 
 
 @end
