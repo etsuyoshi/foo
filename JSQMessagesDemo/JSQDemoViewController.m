@@ -44,6 +44,8 @@
     NameTableView *tableView;
     
     NSString *strDeviceKey;
+    
+    BOOL isSendable;//送信可能ステータスを定義(連打して連続で送信できないようにする)
 }
 
 //はじめて一対一で話をする時はtimeLineIdは存在しないのでヌルのまま
@@ -118,15 +120,26 @@
                 //↑正しいか分からない
                 NSLog(@"照合！！！！");
                 
-                //②抽出したら以下のself.messagesにメッセージを格納
-                JSQMessage *addMessage =
-                [JSQMessage messageWithText:arrMessage[i][@"message"]
-                                     sender:arrMessage[i][@"account_id"]];//本当はnameにしたい！！
-                [self.messages addObject:addMessage];
+                NSLog(@"id = %@, message = %@",
+                      arrMessage[i][@"account_id"],
+                      arrMessage[i][@"message"]);
                 
-                
-                //③(次回以降同じメッセージを表示しないよう)格納したらdeleteMessageArrayで当該メッセージオブジェクト自体を削除する
-                [CommonAPI deleteMessage:i];
+                //メッセージの内容がnilでないとき
+                if(arrMessage[i][@"account_id"] != nil &&
+                   ![arrMessage[i][@"account_id"] isEqual:[NSNull null]] &&
+                   arrMessage[i][@"message"] != nil &&
+                   ![arrMessage[i][@"message"] isEqual:[NSNull null]]){
+                    
+                    //②抽出したら以下のself.messagesにメッセージを格納
+                    JSQMessage *addMessage =
+                    [JSQMessage messageWithText:arrMessage[i][@"message"]
+                                         sender:arrMessage[i][@"account_id"]];//本当はnameにしたい！！
+                    [self.messages addObject:addMessage];
+                    
+                    
+                    //③(次回以降同じメッセージを表示しないよう)格納したらdeleteMessageArrayで当該メッセージオブジェクト自体を削除する
+                    [CommonAPI deleteMessage:i];
+                }
             }
         }
     }
@@ -234,6 +247,8 @@
 {
     [super viewDidLoad];
     
+    isSendable = true;
+    
     NSLog(@"timeLineUsers = %@", self.arrTimeLineUsers);
     UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
     strDeviceKey = store[@"device_key"];
@@ -293,16 +308,18 @@
      *
      */
     self.outgoingBubbleImageView = [JSQMessagesBubbleImageFactory
-                                    outgoingMessageBubbleImageViewWithColor:[UIColor jsq_messageBubbleLightGrayColor]];
+                                    outgoingMessageBubbleImageViewWithColor:
+                                    [UIColor jsq_messageBubbleLightGrayColor]];
     
     self.incomingBubbleImageView = [JSQMessagesBubbleImageFactory
-                                    incomingMessageBubbleImageViewWithColor:[UIColor jsq_messageBubbleGreenColor]];
+                                    incomingMessageBubbleImageViewWithColor:
+                                    [UIColor jsq_messageBubbleGreenColor]];
     
-    self.navigationItem.rightBarButtonItem =
-    [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"typing"]
-                                     style:UIBarButtonItemStyleBordered
-                                    target:self
-                                    action:@selector(receiveMessagePressed:)];
+//    self.navigationItem.rightBarButtonItem =
+//    [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"typing"]
+//                                     style:UIBarButtonItemStyleBordered
+//                                    target:self
+//                                    action:@selector(receiveMessagePressed:)];
 
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
@@ -627,6 +644,10 @@
      *  3. Call `finishSendingMessage`
      */
     
+    if(isSendable){
+    isSendable = false;//正常終了、異常終了に関わらず、送信ステータスが決まるまで送信できないようにする
+    
+    
     NSLog(@"didPressSendButton");
     
     [JSQSystemSoundPlayer jsq_playMessageSentSound];
@@ -689,6 +710,11 @@
          
          
          NSLog(@"userinfo=%@", userInfo);
+         
+         //異常終了にしろ、正常終了にしろ、送信ステータスが決定したので入力を受け付けるようにする
+         isSendable = true;
+         
+         
          if(userInfo == nil ||
             [userInfo isEqual:[NSNull null]]){
              [self dispSendError:0];
@@ -778,7 +804,7 @@
              [self dispSendError:1];
          }
      }];
-    
+    }
 }
 
 -(void)dispSendError:(int)errorNo{

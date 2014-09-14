@@ -76,7 +76,7 @@
     
     
     
-//    //temporary:when reset : clear
+    //temporary:when reset : clear
 //    NSArray *array = [NSArray array];
 //    [CommonAPI setIdArray:array];
     
@@ -118,7 +118,7 @@
     [[UIBarButtonItem alloc]
      initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
      target:self
-     action:@selector(addId)];
+     action:@selector(addInputId)];
     // Here I think you wanna add the searchButton and not the filterButton..
     self.navigationItem.rightBarButtonItem = addButton;
     
@@ -269,13 +269,14 @@
                     [self receiveMessageView:@"no message 1009"];
                 }else{
                     NSLog(@"メッセージを受信しました");
+                    //受信した全てのメッセージに対して
                     for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
                         NSLog(@"message info %d = %@", iMsg, userInfo[@"messages"][iMsg]);
 //                    NSString *strMessage = userInfo[@"messages"][iMsg][@"message"];
 //                    NSLog(@"message %d = %@", iMsg, strMessage);
                         
                         
-                        //メッセージの内容をデバイスに格納して、後で表示させる必要がある。
+                        //タイムライン上で表示させるため、メッセージの内容をデバイスに格納
                         [self addMessageObj:userInfo[@"messages"][iMsg]];
                         
                         //タイムライン上でメッセージを受信した時に表示する通知メッセージ
@@ -285,6 +286,13 @@
                          userInfo[@"messages"][iMsg][@"message"]];
                         //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
                         [self receiveMessageView:strDispNotification];
+                        
+                        
+                        //受信した相手をまだ追加していない場合はテーブルビューに表示する
+                        if(![CommonAPI findId:userInfo[@"messages"][iMsg][@"account_id"]]){
+                            //apiをキックしてユーザー情報を取得してきてデバイスに保存する
+                            [self determineAdd:userInfo[@"messages"][iMsg][@"account_id"]];
+                        }
                     }
                 }
                 
@@ -486,7 +494,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 }
 
 //メニューの右ボタン；追加ボタン
--(void)addId{
+-(void)addInputId{
     
     //case1
     //アラートメッセージで入力させる場合(開始)
@@ -621,7 +629,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     
     UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
     NSString *strDeviceKey = store[@"device_key"];
-    //idが存在していればtableViewの行を一つ増やす
+    //apiをキックしてDBにidが存在していればtableViewの行を一つ増やす
     [[DataConnect sharedClient]
      findUserWithDeviceKey:strDeviceKey
      accountId:strText
@@ -640,11 +648,17 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 //             if(![arrIndivisualId containsObject:userInfo[@"user"][@"account_id"]]){
              if(![self containsIndivisualId:userInfo[@"user"][@"account_id"]]){
                  
+                 //arrIndivisualIdに追加する
 //                 [arrIndivisualId addObject:userInfo[@"user"][@"account_id"]];
                  [arrIndivisualId addObject:userInfo[@"user"]];
+                 NSLog(@"table add -> %@", userInfo[@"user"]);
                  [self.tableView reloadData];
                  
-                 [SVProgressHUD showSuccessWithStatus:@"追加しました!"];
+                 
+                 //ダイアログの表示
+                 [SVProgressHUD showSuccessWithStatus:
+                  [NSString stringWithFormat:@"%@が追加されました!",
+                   userInfo[@"user"][@"account_id"]]];
                  
                  //デバイスに格納する相手に関する情報
                  //将来的にタップした時にtimelineに渡される辞書になる。

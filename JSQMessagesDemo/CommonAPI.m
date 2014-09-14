@@ -87,6 +87,16 @@
     }
 }
 
++(BOOL)findId:(NSString *)strId{
+    NSArray *arrId = [CommonAPI getIdArray];
+    for(NSDictionary *dictIdInfo in arrId){
+        if([dictIdInfo[@"account_id"] isEqualToString:strId]){
+            return true;
+        }
+    }
+    return false;
+}
+
 //既に保存されているaccount_idのユーザーとのタイムラインidを編集する
 //※新規にユーザーを追加した段階ではuserInfoの中にタイムラインidはnil(もしくはそんな項目すらない状態になっている？)
 +(BOOL)modifyTimeLineId:(NSString *)argStrTimeLineId toUserId:(NSString *)argStrUserId{
