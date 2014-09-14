@@ -203,7 +203,9 @@
     NSMutableArray *arrMessage = [arrTmp mutableCopy];
     arrTmp = nil;
     
-    [arrMessage removeObjectAtIndex:no];
+    if(arrMessage.count > no){
+        [arrMessage removeObjectAtIndex:no];
+    }
     [CommonAPI setMessageArray:arrMessage];
     return true;
     
