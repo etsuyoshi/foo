@@ -308,8 +308,8 @@
 			children = (
 				2A23FF96199DD997009BA3CD /* DataConnect.h */,
 				2A23FF95199DD997009BA3CD /* DataConnect.m */,
-				2AB814AF1981485600A8A499 /* BSDefaultViewObject.m */,
 				2AB814B01981485600A8A499 /* BSDefaultViewObject.h */,
+				2AB814AF1981485600A8A499 /* BSDefaultViewObject.m */,
 				2A7A7E9A19814357004869D1 /* BSSellerAPIClient.h */,
 				2A7A7E9B19814357004869D1 /* BSSellerAPIClient.m */,
 				2A7A7E9C19814357004869D1 /* BSUserManager.h */,

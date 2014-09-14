@@ -100,15 +100,6 @@
     
     
     
-    timer = [NSTimer
-             scheduledTimerWithTimeInterval:1
-             target:self
-             selector:@selector(checkMessage:)
-             userInfo:nil
-             repeats:YES];
-    
-    NSLog(@"timer validate");
-    
     
     
     
@@ -139,6 +130,7 @@
     //以下account_idの文字列のみ格納された配列になっている
 //    NSArray *arrTmp = [[CommonAPI getIdArray] mutableCopy];//i.e.[NSMutableArray arrayWithObjects:@"taro", @"jiro",
     NSArray *arrTmp = [[CommonAPI getIdArray] mutableCopy];//i.e. factor -> [account_id, name, timeLineId]
+    NSLog(@"arrTmp = %@", arrTmp);
     arrIndivisualId = [NSMutableArray array];
     for(int i = 0;i < arrTmp.count;i++){
 //        [arrIndivisualId addObject:arrTmp[i][@"account_id"]];
@@ -170,6 +162,15 @@
 //    [self receiveMessageView];
     
     
+    //画面が表示されるたびにタイマー有効化
+    timer = [NSTimer
+             scheduledTimerWithTimeInterval:2
+             target:self
+             selector:@selector(checkMessage:)
+             userInfo:nil
+             repeats:YES];
+    
+    NSLog(@"timer validate");
     
 }
 
@@ -184,7 +185,7 @@
 }
 
 -(void)receiveMessageView:(NSString *)_strMessage{
-    
+    NSLog(@"receiveMessageView");
     labelMessageReceive =
     [[UILabel alloc]
      initWithFrame:
@@ -193,8 +194,15 @@
                 50)];
     labelMessageReceive.backgroundColor =
     [[UIColor greenColor] colorWithAlphaComponent:0.9f];
+    //test
+    if([_strMessage isEqualToString:@"no message 1009"]){
+        labelMessageReceive.backgroundColor =
+        [[UIColor redColor] colorWithAlphaComponent:0.9f];
+    }
+    
     labelMessageReceive.text = _strMessage;
     labelMessageReceive.textColor = [UIColor whiteColor];
+
     [self.view addSubview:labelMessageReceive];
     
     //時間遅れ
@@ -236,56 +244,63 @@
         completion:^(NSDictionary *userInfo,
                      NSURLSessionDataTask *task,
                      NSError *error){
-            NSLog(@"userInfo = %@", userInfo);
             //データ通信中なので通信可能状態に設定
             isConnectMode = YES;
-            
-            NSLog(@"tableview : succeed = %d", (int)[userInfo[@"succeed"] integerValue]);
-            NSLog(@"tableview : message = %@", userInfo[@"messages"]);
-            
-            if([userInfo[@"succeed"] integerValue] == 1){
-                NSLog(@"tableview : 通信成功");
-            }
-            
-            if(userInfo[@"messages"] == nil ||
-               [userInfo[@"messages"] isEqual:[NSNull null]]){
-                NSLog(@"tableview : メッセージがnullです。");
-            }
-            
-            int numOfMessages = (int)((NSArray *)userInfo[@"messages"]).count;
-            if(numOfMessages == 0){
-                NSLog(@"tableview : メッセージの個数がゼロ");
-            }else{
-                NSLog(@"tableview : メッセージの内容は以下の通りです");
-                for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
-                    NSLog(@"message info %d = %@", iMsg, userInfo[@"messages"][iMsg]);
+            if(error == nil || [error isEqual:[NSNull null]]){
+                NSLog(@"userInfo = %@", userInfo);
+                
+                
+                NSLog(@"tableview : succeed = %d", (int)[userInfo[@"succeed"] integerValue]);
+                NSLog(@"tableview : message = %@", userInfo[@"messages"]);
+                
+//            if([userInfo[@"succeed"] integerValue] == 1){
+//                NSLog(@"tableview : 通信成功");
+//            }
+//            
+//            if(userInfo[@"messages"] == nil ||
+//               [userInfo[@"messages"] isEqual:[NSNull null]]){
+//                NSLog(@"tableview : メッセージがnullです。");
+//            }
+                
+                int numOfMessages = (int)((NSArray *)userInfo[@"messages"]).count;
+                if(numOfMessages == 0){
+                    NSLog(@"メッセージはありません");
+                    //test
+                    [self receiveMessageView:@"no message 1009"];
+                }else{
+                    NSLog(@"メッセージを受信しました");
+                    for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
+                        NSLog(@"message info %d = %@", iMsg, userInfo[@"messages"][iMsg]);
 //                    NSString *strMessage = userInfo[@"messages"][iMsg][@"message"];
 //                    NSLog(@"message %d = %@", iMsg, strMessage);
-                    
-                    
-                    //メッセージの内容をデバイスに格納して、後で表示させる必要がある。
-                    [self addMessageObj:userInfo[@"messages"][iMsg]];
-                    
-                    //タイムライン上でメッセージを受信した時に表示する通知メッセージ
-                    NSString *strDispNotification =
-                    [NSString stringWithFormat:@"%@:%@",
-                     userInfo[@"messages"][iMsg][@"account_id"],
-                     userInfo[@"messages"][iMsg][@"message"]];
-                    //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
-                    [self receiveMessageView:strDispNotification];
+                        
+                        
+                        //メッセージの内容をデバイスに格納して、後で表示させる必要がある。
+                        [self addMessageObj:userInfo[@"messages"][iMsg]];
+                        
+                        //タイムライン上でメッセージを受信した時に表示する通知メッセージ
+                        NSString *strDispNotification =
+                        [NSString stringWithFormat:@"%@:%@",
+                         userInfo[@"messages"][iMsg][@"account_id"],
+                         userInfo[@"messages"][iMsg][@"message"]];
+                        //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
+                        [self receiveMessageView:strDispNotification];
+                    }
                 }
+                
+                
+                //メッセージがあれば内容をデバイスに一時的に保存してタイムラインに移動
+                NSLog(@"tableview : receivemessage = %@", userInfo);
+            }else{
+                NSLog(@"サーバー通信上のエラーが発生しました");
+                NSLog(@"error = %@", error);
             }
-            
-            //メッセージの有無を判定
-            
-            
-            //メッセージがあれば内容をデバイスに一時的に保存してタイムラインに移動
-            NSLog(@"tableview : receivemessage = %@", userInfo);
-                  
             
             
             
         }];
+    }else{
+        NSLog(@"isConnectMode = %d", isConnectMode);
     }
     
 }
@@ -293,6 +308,20 @@
 //最悪、ここはできなくてもよい
 //入力：msgInfo(account_id, id, message, time_line_id):メッセージ情報
 -(void)addMessageObj:(NSDictionary *)msgInfo{
+    NSLog(@"addmessageObj : arg = %@", msgInfo);
+    
+    [CommonAPI addMessage:msgInfo];
+    
+    
+    NSArray *testArrMessage = [CommonAPI getMessageArray];
+    NSMutableDictionary *testDictMessage = [[testArrMessage lastObject] mutableCopy];
+    
+    NSLog(@"メッセージを格納しました , last : %@", testDictMessage);
+    for(int i = 0;i < testArrMessage.count;i++){
+        NSLog(@"all message : %d : %@", i, testArrMessage[i]);
+    }
+    
+    
     return;//テスト：以下本番では作る必要あり(時間なかったので後回し)
     //機能１
     //user情報にmessageObjを紐づける
@@ -309,18 +338,59 @@
     
     //メッセージ情報からアカウントを把握
     NSString *strAccountId = msgInfo[@"account_id"];
-    
-    
-    
+    //test->remove
+    for(int i = 0;i < arrIndivisualId.count;i++){
+        NSLog(@"arrIndivisualId %d = %@", i, arrIndivisualId[i]);
+    }
+    NSLog(@"strAccountId = %@", strAccountId);
     //既存のarrIndivisualIdに上記メッセージ配列を追加する
     for(int i = 0;i < arrIndivisualId.count;i++){
-        //メッセージ情報から取得したアカウントが格納されていれば
-        if(arrIndivisualId[i][strAccountId] != nil &&
-           [arrIndivisualId[i][strAccountId] isEqual:[NSNull null]]){
-            //既にメッセージ配列の部分に何かしらのオブジェクトが格納されていれば
-            if(arrIndivisualId[i][@"messages"] != nil &&
-               [arrIndivisualId[i][@"messages"] isEqual:[NSNull null]]){
+        NSLog(@"for arrIndivisualId %d = %@", i, arrIndivisualId[i][@"account_id"]);
+        //メッセージ情報から取得したアカウントが既にデバイスに格納されていれば
+        if(  arrIndivisualId[i][@"account_id"] != nil &&
+           ![arrIndivisualId[i][@"account_id"] isEqual:[NSNull null]]){
+            NSLog(@"through arrindivisualId judgement : %@",
+                  arrIndivisualId[i][@"account_id"]);
+            
+            //探索中idのアカウントが受信者アカウントに等しければ
+            if([arrIndivisualId[i][@"account_id"] isEqualToString:strAccountId]){
+                //受信者と同じidが既に選択画面に存在していればメッセージ格納用のmutableArrayを格納する
                 
+                
+                //メッセージ配列が存在しない場合(初期状態)
+                if(arrIndivisualId[i][@"messages"] == nil ||
+                   [arrIndivisualId[i][@"messages"] isEqual:[NSNull null]]){
+                    NSMutableArray *arrMessages =
+                    [NSMutableArray arrayWithObjects:msgInfo, nil];
+                    
+                    //arrindivisualIdに追加する
+                    
+                    
+                    
+                    
+                }
+                
+                
+                
+                //メッセージ配列が存在している場合(既にメッセージを受信しているが、タイムライン上で表示していない場合)
+                
+                
+                
+                
+                
+                
+                
+                
+                
+             
+            }
+            
+            
+            //既にメッセージ配列の部分に何かしらのオブジェクトが格納されていれば
+            if(  arrIndivisualId[i][@"messages"] != nil &&
+               ![arrIndivisualId[i][@"messages"] isEqual:[NSNull null]]){
+                NSLog(@"through arrindivisualId judgement : %@",
+                      arrIndivisualId[i][@"messages"]);
                 //メッセージ配列に格納されているオブジェクトが配列型かどうか
                 if([arrIndivisualId[i][@"messages"] isKindOfClass:[NSMutableArray class]]){
 //                   [arrIndivisualId[i][@"messages"] isKindOfClass:[NSArray class]]){
@@ -337,15 +407,20 @@
                     NSLog(@"クリティカルエラー：arrIndivisualIdが配列ではない別のオブジェクトが格納されています。");
                 }
                 
-            }else{
+            }else{//デバイスに受信者のアカウントは登録されているが
                 //メッセージ配列を新規作成して追加する
                 NSMutableArray *mArrMsgInfo = [NSMutableArray array];
                 [mArrMsgInfo addObject:msgInfo];
-                arrIndivisualId[i][@"messages"] = mArrMsgInfo;
+                
+                //
+                //arrIndivisualId[i][@"messages"] = mArrMsgInfo;
                 mArrMsgInfo = nil;
                 
                 NSLog(@"メッセージ情報を新規追加 : arrIndivisualId = %@", arrIndivisualId);
             }
+            
+            NSLog(@"arrIndivisualId = %@", arrIndivisualId);
+            
             
             //[commonAPIでデバイスsetする]
             [CommonAPI setIdArray:arrIndivisualId];
@@ -358,7 +433,7 @@
             //ここでnameをfinduserから取得してしまうと非同期処理が開始されてしまい、本スレッドで仮に複数のメッセージが存在した場合
             //同一account_idで重複してしまう
             
-            arrIndivisualId[i][@"messages"] = [NSMutableArray array];
+            arrIndivisualId[i][@"messages"] = [NSMutableArray array];///////////
             [((NSMutableArray *)arrIndivisualId[i][@"messages"]) addObject:dictUserInfo];
             
 //            [arrIndivisualId[i][@"messages"] addObject:dictUserInfo];
@@ -372,6 +447,9 @@
     
     //呼び出すときから考えてやらなければいけない。
     
+    
+    
+    NSLog(@"addMessageObj : arrIndivisualId = %@", arrIndivisualId);
 }
 
 //-(void)closeSoftKeyboard{
@@ -794,6 +872,12 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
                  vc.arrTimeLineUsers = arrUsers;
                  //timeLineIdが発行されている場合は入力されている(未入力の場合はnil)
                  vc.strTimeLineId = arrIndivisualId[indexPath.row][@"timeLineId"];
+                 if(arrIndivisualId[indexPath.row][@"name"] == nil ||
+                    [arrIndivisualId[indexPath.row][@"name"] isEqual:[NSNull null]]){
+                     vc.title = arrIndivisualId[indexPath.row][@"name"];
+                 }else{
+                     vc.title = arrIndivisualId[indexPath.row][@"account_name"];
+                 }
                  [timer invalidate];//タイマー停止
                  NSLog(@"tableview : タイマーを停止");
                  NSLog(@"vc.timelineusers = %@", vc.arrTimeLineUsers);

@@ -17,4 +17,7 @@
 +(NSString *)getIdNoAt:(int)no;
 //+(NSArray *)initArrayGroupId;
 +(BOOL)modifyTimeLineId:(NSString *)argStrTimeLineId toUserId:(NSString *)argStrUserId;
++(BOOL)addMessage:(NSDictionary*)dictUser;
++(NSArray *)getMessageArray;
++(BOOL)deleteMessage:(int)no;
 @end
