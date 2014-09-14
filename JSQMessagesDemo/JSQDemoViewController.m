@@ -69,6 +69,7 @@
 
 - (void)initialize
 {
+    NSLog(@"initialize");
     /**
      *  Load some fake messages for demo.
      *
@@ -76,33 +77,6 @@
      */
     
     
-    //①commonAPIからgetMessageArrayで当該タイムライン(個人の場合はaccount_idが等しいもの)のみ抽出
-    //②抽出したら以下のself.messagesにメッセージを格納
-    //③(次回以降同じメッセージを表示しないよう)格納したらdeleteMessageArrayで当該メッセージオブジェクト自体を削除する
-    /*
-     ①②③
-     ここに書く！！！！！！！！！！！！！！
-     */
-     //①
-    NSMutableArray *arrMessage = [[CommonAPI getMessageArray] mutableCopy];
-    for(int i =0;i < arrMessage.count;i++){
-        NSLog(@"initializer : %d : %@", i, arrMessage[i]);
-        
-        //既に格納されているタイムラインユーザーとの照合
-        for(int j = 0;j < self.arrTimeLineUsers.count;j++){
-            
-            if([arrMessage[i][@"account_id"] isEqualToString:self.arrTimeLineUsers[j][@"account_id"] ]){
-                //↑正しいか分からない
-                NSLog(@"照合！！！！");
-            }
-        }
-    }
-    
-    
-    //②
-    
-    
-    //③
     
     self.messages = [[NSMutableArray alloc] initWithObjects:
                      
@@ -121,6 +95,45 @@
 //                     [[JSQMessage alloc] initWithText:@"It is unit-tested, free, and open-source." sender:kJSQDemoAvatarNameCook date:[NSDate date]],
 //                     [[JSQMessage alloc] initWithText:@"Oh, and there's sweet documentation." sender:self.sender date:[NSDate date]],
                      nil];
+    
+    
+    
+    //①commonAPIからgetMessageArrayで当該タイムライン(個人の場合はaccount_idが等しいもの)のみ抽出
+    //②抽出したら以下のself.messagesにメッセージを格納
+    //③(次回以降同じメッセージを表示しないよう)格納したらdeleteMessageArrayで当該メッセージオブジェクト自体を削除する
+    /*
+     ①②③
+     ここに書く！！！！！！！！！！！！！！
+     */
+    //①commonAPIからgetMessageArrayで当該タイムライン(個人の場合はaccount_idが等しいもの)のみ抽出
+    NSMutableArray *arrMessage = [[CommonAPI getMessageArray] mutableCopy];
+    NSLog(@"arrMessage.count = %d", (int)arrMessage.count);
+    for(int i =0;i < arrMessage.count;i++){
+        NSLog(@"initializer : %d : %@", i, arrMessage[i]);
+        
+        //既に格納されているタイムラインユーザーとの照合
+        for(int j = 0;j < self.arrTimeLineUsers.count;j++){
+            
+            if([arrMessage[i][@"account_id"] isEqualToString:self.arrTimeLineUsers[j][@"account_id"] ]){
+                //↑正しいか分からない
+                NSLog(@"照合！！！！");
+                
+                //②抽出したら以下のself.messagesにメッセージを格納
+                JSQMessage *addMessage =
+                [JSQMessage messageWithText:arrMessage[i][@"message"]
+                                     sender:arrMessage[i][@"account_id"]];//本当はnameにしたい！！
+                [self.messages addObject:addMessage];
+                
+                
+                //③(次回以降同じメッセージを表示しないよう)格納したらdeleteMessageArrayで当該メッセージオブジェクト自体を削除する
+                [CommonAPI deleteMessage:i];
+            }
+        }
+    }
+    
+    
+    
+    
     
     /**
      *  Create avatar images once.

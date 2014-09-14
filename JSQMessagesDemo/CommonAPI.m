@@ -151,7 +151,7 @@
 
 
 +(NSArray *)getMessageArray{
-    NSLog(@"getIdarray");
+    NSLog(@"getMessageArray");
     UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
     
     NSData *dataReturn = [store dataForKey:@"array_message"];
@@ -162,17 +162,19 @@
     
     if(arrayReturn == nil ||
        [arrayReturn isEqual:[NSNull null]]){
+        NSLog(@"getMessageArray : arrayReturn=null so initialize");
         arrayReturn = [NSMutableArray array];
     }
     
     store = nil;
+    NSLog(@"getMessageArray : arrayReturn = %@", arrayReturn);
     return arrayReturn;
 }
 
 //指定されたIDを配列に格納してデバイスに保存
-+(BOOL)addMessage:(NSDictionary*)dictUser{
++(BOOL)addMessage:(NSDictionary*)dictMessage{
     
-    NSArray *arrTmp = [CommonAPI getIdArray];
+    NSArray *arrTmp = [CommonAPI getMessageArray];
     
     if(arrTmp == nil || [arrTmp isEqual:[NSNull null]]){
         arrTmp = [NSArray array];
@@ -181,9 +183,13 @@
     arrTmp = nil;
     
     
-    NSLog(@"追加 : dictUser = %@", dictUser);
-    [arrMessage addObject:dictUser];
-    [CommonAPI setIdArray:arrMessage];
+    NSLog(@"追加 : dictMessage = %@", dictMessage);
+    [arrMessage addObject:dictMessage];
+    
+    NSLog(@"addMessage : arrmessage = %@", arrMessage);
+    [CommonAPI setMessageArray:arrMessage];
+    
+    NSLog(@"addMessage : getMessageArray = %@", [CommonAPI getMessageArray]);
     return true;//特に意味はない
 }
 
@@ -198,10 +204,25 @@
     arrTmp = nil;
     
     [arrMessage removeObjectAtIndex:no];
-    [CommonAPI setIdArray:arrMessage];
+    [CommonAPI setMessageArray:arrMessage];
     return true;
     
 }
 
++(void)setMessageArray:(NSArray *)arrayInput{
+    //uickeychainstoreテスト
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+    
+    
+    // NSDataオブジェクトへ変換(エンコード)
+    NSData *dataInput = [NSKeyedArchiver archivedDataWithRootObject:arrayInput];
+    
+    //格納
+    [store setData:dataInput forKey:@"array_message"];
+    [store synchronize];
+    
+    store = nil;
+    dataInput = nil;
+}
 
 @end

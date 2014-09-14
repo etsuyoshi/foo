@@ -100,15 +100,6 @@
     
     
     
-    timer = [NSTimer
-             scheduledTimerWithTimeInterval:1
-             target:self
-             selector:@selector(checkMessage:)
-             userInfo:nil
-             repeats:YES];
-    
-    NSLog(@"timer validate");
-    
     
     
     
@@ -171,6 +162,15 @@
 //    [self receiveMessageView];
     
     
+    //画面が表示されるたびにタイマー有効化
+    timer = [NSTimer
+             scheduledTimerWithTimeInterval:2
+             target:self
+             selector:@selector(checkMessage:)
+             userInfo:nil
+             repeats:YES];
+    
+    NSLog(@"timer validate");
     
 }
 
@@ -185,7 +185,7 @@
 }
 
 -(void)receiveMessageView:(NSString *)_strMessage{
-    
+    NSLog(@"receiveMessageView");
     labelMessageReceive =
     [[UILabel alloc]
      initWithFrame:
@@ -194,8 +194,15 @@
                 50)];
     labelMessageReceive.backgroundColor =
     [[UIColor greenColor] colorWithAlphaComponent:0.9f];
+    //test
+    if([_strMessage isEqualToString:@"no message 1009"]){
+        labelMessageReceive.backgroundColor =
+        [[UIColor redColor] colorWithAlphaComponent:0.9f];
+    }
+    
     labelMessageReceive.text = _strMessage;
     labelMessageReceive.textColor = [UIColor whiteColor];
+
     [self.view addSubview:labelMessageReceive];
     
     //時間遅れ
@@ -237,56 +244,63 @@
         completion:^(NSDictionary *userInfo,
                      NSURLSessionDataTask *task,
                      NSError *error){
-            NSLog(@"userInfo = %@", userInfo);
             //データ通信中なので通信可能状態に設定
             isConnectMode = YES;
-            
-            NSLog(@"tableview : succeed = %d", (int)[userInfo[@"succeed"] integerValue]);
-            NSLog(@"tableview : message = %@", userInfo[@"messages"]);
-            
-            if([userInfo[@"succeed"] integerValue] == 1){
-                NSLog(@"tableview : 通信成功");
-            }
-            
-            if(userInfo[@"messages"] == nil ||
-               [userInfo[@"messages"] isEqual:[NSNull null]]){
-                NSLog(@"tableview : メッセージがnullです。");
-            }
-            
-            int numOfMessages = (int)((NSArray *)userInfo[@"messages"]).count;
-            if(numOfMessages == 0){
-                NSLog(@"tableview : メッセージの個数がゼロ");
-            }else{
-                NSLog(@"tableview : メッセージの内容は以下の通りです");
-                for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
-                    NSLog(@"message info %d = %@", iMsg, userInfo[@"messages"][iMsg]);
+            if(error == nil || [error isEqual:[NSNull null]]){
+                NSLog(@"userInfo = %@", userInfo);
+                
+                
+                NSLog(@"tableview : succeed = %d", (int)[userInfo[@"succeed"] integerValue]);
+                NSLog(@"tableview : message = %@", userInfo[@"messages"]);
+                
+//            if([userInfo[@"succeed"] integerValue] == 1){
+//                NSLog(@"tableview : 通信成功");
+//            }
+//            
+//            if(userInfo[@"messages"] == nil ||
+//               [userInfo[@"messages"] isEqual:[NSNull null]]){
+//                NSLog(@"tableview : メッセージがnullです。");
+//            }
+                
+                int numOfMessages = (int)((NSArray *)userInfo[@"messages"]).count;
+                if(numOfMessages == 0){
+                    NSLog(@"メッセージはありません");
+                    //test
+                    [self receiveMessageView:@"no message 1009"];
+                }else{
+                    NSLog(@"メッセージを受信しました");
+                    for(int iMsg = 0;iMsg < numOfMessages ;iMsg++){
+                        NSLog(@"message info %d = %@", iMsg, userInfo[@"messages"][iMsg]);
 //                    NSString *strMessage = userInfo[@"messages"][iMsg][@"message"];
 //                    NSLog(@"message %d = %@", iMsg, strMessage);
-                    
-                    
-                    //メッセージの内容をデバイスに格納して、後で表示させる必要がある。
-                    [self addMessageObj:userInfo[@"messages"][iMsg]];
-                    
-                    //タイムライン上でメッセージを受信した時に表示する通知メッセージ
-                    NSString *strDispNotification =
-                    [NSString stringWithFormat:@"%@:%@",
-                     userInfo[@"messages"][iMsg][@"account_id"],
-                     userInfo[@"messages"][iMsg][@"message"]];
-                    //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
-                    [self receiveMessageView:strDispNotification];
+                        
+                        
+                        //メッセージの内容をデバイスに格納して、後で表示させる必要がある。
+                        [self addMessageObj:userInfo[@"messages"][iMsg]];
+                        
+                        //タイムライン上でメッセージを受信した時に表示する通知メッセージ
+                        NSString *strDispNotification =
+                        [NSString stringWithFormat:@"%@:%@",
+                         userInfo[@"messages"][iMsg][@"account_id"],
+                         userInfo[@"messages"][iMsg][@"message"]];
+                        //タイムラインに遷移後にデバイスに保存したメッセージの内容を表示(時間等)
+                        [self receiveMessageView:strDispNotification];
+                    }
                 }
+                
+                
+                //メッセージがあれば内容をデバイスに一時的に保存してタイムラインに移動
+                NSLog(@"tableview : receivemessage = %@", userInfo);
+            }else{
+                NSLog(@"サーバー通信上のエラーが発生しました");
+                NSLog(@"error = %@", error);
             }
-            
-            //メッセージの有無を判定
-            
-            
-            //メッセージがあれば内容をデバイスに一時的に保存してタイムラインに移動
-            NSLog(@"tableview : receivemessage = %@", userInfo);
-                  
             
             
             
         }];
+    }else{
+        NSLog(@"isConnectMode = %d", isConnectMode);
     }
     
 }
@@ -297,6 +311,16 @@
     NSLog(@"addmessageObj : arg = %@", msgInfo);
     
     [CommonAPI addMessage:msgInfo];
+    
+    
+    NSArray *testArrMessage = [CommonAPI getMessageArray];
+    NSMutableDictionary *testDictMessage = [[testArrMessage lastObject] mutableCopy];
+    
+    NSLog(@"メッセージを格納しました , last : %@", testDictMessage);
+    for(int i = 0;i < testArrMessage.count;i++){
+        NSLog(@"all message : %d : %@", i, testArrMessage[i]);
+    }
+    
     
     return;//テスト：以下本番では作る必要あり(時間なかったので後回し)
     //機能１

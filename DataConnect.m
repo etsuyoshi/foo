@@ -253,6 +253,7 @@
     
     if(deviceKey){
         parameters[@"device_key"] = deviceKey;
+        NSLog(@"device_key = %@", deviceKey);
     }else{
         NSLog(@"devicekey null");
         return;
