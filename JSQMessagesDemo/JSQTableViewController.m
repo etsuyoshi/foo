@@ -40,8 +40,12 @@
     
     BOOL isConnectMode;
     
-    
+    //受信用ステータスバー
     UILabel *labelMessageReceive;
+    
+    
+    //ヘッダービュー：相手を追加するボタン設置
+    UIView *viewHeader;
     
     //キーボード関連
 //    UIView *viewTable;
@@ -83,6 +87,10 @@
     
     
     isConnectMode = YES;
+    
+    
+    //画面下段に追加ボタンを設置
+    [self addFooterView];
     
     [[BSUserManager sharedManager]
      autoSignInWithBlock:^(NSError *error){
@@ -1037,6 +1045,32 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 //    keyboardIsShown = YES;
 //}
 
-
+-(void)addFooterView{
+    
+    int heightOfHeader = 60;
+    int diameterButton = 40;
+    viewHeader =
+    [[UIView alloc]
+    initWithFrame:
+    CGRectMake(0,self.view.bounds.size.height - heightOfHeader,
+               self.view.bounds.size.width,
+               heightOfHeader)];
+    
+    viewHeader.backgroundColor =
+    [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
+    
+    UIButton *buttonAdd = [UIButton buttonWithType:UIButtonTypeCustom];
+//    buttonAdd.imageView = [[UIImageView alloc]initWithImage:
+//                           [UIImage imageNamed:@"imgAddId"]];
+    [buttonAdd setImage:[UIImage imageNamed:@"imgAddId"]
+               forState:UIControlStateNormal];
+    buttonAdd.frame =
+    CGRectMake((self.view.bounds.size.width - diameterButton)/2,
+               (heightOfHeader / diameterButton)/2,
+               diameterButton, diameterButton);
+    [viewHeader addSubview:buttonAdd];
+    
+    [self.view addSubview:viewHeader];
+}
 
 @end
