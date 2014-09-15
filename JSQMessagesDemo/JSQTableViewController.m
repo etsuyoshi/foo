@@ -184,8 +184,31 @@
     NSLog(@"finish viewwillappear");
 }
 
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    
+    NSLog(@"viewWillDisappear");
+//    for(UIView *view in self.view.subviews){
+//        [view removeFromSuperview];
+//    }
+    [labelMessageReceive removeFromSuperview];
+}
+
+-(void)viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
+    
+    NSLog(@"viewDidDisappear");
+    
+//    for(UIView *view in self.view.subviews){
+//        [view removeFromSuperview];
+//    }
+    [labelMessageReceive removeFromSuperview];
+}
+
 -(void)receiveMessageView:(NSString *)_strMessage{
     NSLog(@"receiveMessageView");
+    [labelMessageReceive removeFromSuperview];
+    
     labelMessageReceive =
     [[UILabel alloc]
      initWithFrame:
@@ -195,7 +218,10 @@
     labelMessageReceive.backgroundColor =
     [[UIColor greenColor] colorWithAlphaComponent:0.9f];
     //test
-    if([_strMessage isEqualToString:@"no message 1009"]){
+    if([_strMessage isEqualToString:
+        [NSString stringWithFormat:@"no message %@",
+         [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"]]
+        ]){
         labelMessageReceive.backgroundColor =
         [[UIColor redColor] colorWithAlphaComponent:0.9f];
     }
@@ -266,7 +292,10 @@
                 if(numOfMessages == 0){
                     NSLog(@"メッセージはありません");
                     //test
-                    [self receiveMessageView:@"no message 1009"];
+                    [self receiveMessageView:
+                     [NSString stringWithFormat:@"no message %@",
+                      [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"]]
+                     ];
                 }else{
                     NSLog(@"メッセージを受信しました");
                     //受信した全てのメッセージに対して
@@ -848,6 +877,13 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
         //タイマーを無効にする
         [timer invalidate];
         NSLog(@"tableview : タイマーを停止");
+        
+        //ステータスバーを全て削除する
+        for(UIView *view in self.view.subviews){
+            [view removeFromSuperview];
+        }
+        
+        
         //本番
         JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
 //        JSQDemo2ViewController *vc = [JSQDemo2ViewController messagesViewController];
