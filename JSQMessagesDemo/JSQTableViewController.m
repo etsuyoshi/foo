@@ -1057,7 +1057,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
                heightOfHeader)];
     
     viewHeader.backgroundColor =
-    [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
+    [UIColor colorWithRed:1 green:1 blue:1 alpha:0.5];
     
     UIButton *buttonAdd = [UIButton buttonWithType:UIButtonTypeCustom];
 //    buttonAdd.imageView = [[UIImageView alloc]initWithImage:
