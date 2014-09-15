@@ -40,8 +40,12 @@
     
     BOOL isConnectMode;
     
-    
+    //受信用ステータスバー
     UILabel *labelMessageReceive;
+    
+    
+    //フッタービュー：相手を追加するボタン設置
+    UIView *viewFooter;
     
     //キーボード関連
 //    UIView *viewTable;
@@ -84,6 +88,10 @@
     
     isConnectMode = YES;
     
+    
+    //画面下段に追加ボタンを設置
+    [self addFooterView];
+    
     [[BSUserManager sharedManager]
      autoSignInWithBlock:^(NSError *error){
          if(error != nil &&
@@ -113,14 +121,15 @@
      target:self
      action:@selector(edit)];
     self.navigationItem.leftBarButtonItem = editButton;
-    
-    UIBarButtonItem *addButton =
-    [[UIBarButtonItem alloc]
-     initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-     target:self
-     action:@selector(addInputId)];
-    // Here I think you wanna add the searchButton and not the filterButton..
-    self.navigationItem.rightBarButtonItem = addButton;
+
+    //追加ボタンは画面下段中央部に設置(ナビゲーションから追加させないようにする)
+//    UIBarButtonItem *addButton =
+//    [[UIBarButtonItem alloc]
+//     initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+//     target:self
+//     action:@selector(addInputId)];
+//    // Here I think you wanna add the searchButton and not the filterButton..
+//    self.navigationItem.rightBarButtonItem = addButton;
     
     
     
@@ -522,7 +531,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     
 }
 
-//メニューの右ボタン；追加ボタン
+//メニューの右ボタン(もしくは画面下段中央の)；追加ボタン
 -(void)addInputId{
     
     //case1
@@ -1037,6 +1046,43 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 //    keyboardIsShown = YES;
 //}
 
-
+-(void)addFooterView{
+    
+    NSLog(@"add footer view");
+    int heightOfHeader = 60;
+    int diameterButton = 55;
+    //画面サイズ自体がnavigationBarによって下にずれているのでその分を上位置に調整してあげる必要がある
+    //テザリング等によりstatusBarの高さが変わる場合(未対応)http://dendrocopos.jp/wp/archives/298
+    viewFooter =
+    [[UIView alloc]
+    initWithFrame:
+    CGRectMake(0,
+               self.view.bounds.size.height - heightOfHeader -
+               self.navigationController.navigationBar.bounds.size.height -
+               [UIApplication sharedApplication].statusBarFrame.size.height,
+               self.view.bounds.size.width,
+               heightOfHeader)];
+    
+    viewFooter.backgroundColor =
+    [UIColor colorWithRed:1 green:1 blue:1 alpha:0];
+    
+    UIButton *buttonAdd = [UIButton buttonWithType:UIButtonTypeCustom];
+//    buttonAdd.imageView = [[UIImageView alloc]initWithImage:
+//                           [UIImage imageNamed:@"imgAddId"]];
+    [buttonAdd setImage:[UIImage imageNamed:@"addImgId"]
+               forState:UIControlStateNormal];
+    buttonAdd.frame =
+    CGRectMake((self.view.bounds.size.width - diameterButton)/2,
+               (heightOfHeader / diameterButton)/2,
+               diameterButton, diameterButton);
+    [buttonAdd addTarget:self
+                  action:@selector(addInputId)
+        forControlEvents:UIControlEventTouchUpInside];
+    [viewFooter addSubview:buttonAdd];
+//
+    [self.view addSubview:viewFooter];
+    
+    NSLog(@"add footer view finished");
+}
 
 @end

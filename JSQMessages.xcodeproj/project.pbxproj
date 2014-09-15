@@ -17,6 +17,7 @@
 		2A91678B199D245D00C61D48 /* NameTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A91678A199D245D00C61D48 /* NameTableView.m */; };
 		2AAF11F419AF27AF0006885B /* JSQDemo2ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AAF11F319AF27AF0006885B /* JSQDemo2ViewController.m */; };
 		2AB814B11981485600A8A499 /* BSDefaultViewObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AB814AF1981485600A8A499 /* BSDefaultViewObject.m */; };
+		2AC97CCD19C6A5FA00E5EB2D /* addImgId.png in Resources */ = {isa = PBXBuildFile; fileRef = 2AC97CCC19C6A5FA00E5EB2D /* addImgId.png */; };
 		2AF1C78D1980154F0061A458 /* fshin.png in Resources */ = {isa = PBXBuildFile; fileRef = 2AF1C7881980154F0061A458 /* fshin.png */; };
 		2AF1C78E1980154F0061A458 /* jin1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2AF1C7891980154F0061A458 /* jin1.png */; };
 		2AF1C78F1980154F0061A458 /* jin2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2AF1C78A1980154F0061A458 /* jin2.png */; };
@@ -143,6 +144,7 @@
 		2AAF11F319AF27AF0006885B /* JSQDemo2ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSQDemo2ViewController.m; path = JSQMessagesDemo/JSQDemo2ViewController.m; sourceTree = SOURCE_ROOT; };
 		2AB814AF1981485600A8A499 /* BSDefaultViewObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BSDefaultViewObject.m; sourceTree = SOURCE_ROOT; };
 		2AB814B01981485600A8A499 /* BSDefaultViewObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSDefaultViewObject.h; sourceTree = SOURCE_ROOT; };
+		2AC97CCC19C6A5FA00E5EB2D /* addImgId.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = addImgId.png; sourceTree = SOURCE_ROOT; };
 		2AF1C7881980154F0061A458 /* fshin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fshin.png; sourceTree = SOURCE_ROOT; };
 		2AF1C7891980154F0061A458 /* jin1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = jin1.png; sourceTree = SOURCE_ROOT; };
 		2AF1C78A1980154F0061A458 /* jin2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = jin2.png; sourceTree = SOURCE_ROOT; };
@@ -332,6 +334,7 @@
 		2AF1C77D198015190061A458 /* image */ = {
 			isa = PBXGroup;
 			children = (
+				2AC97CCC19C6A5FA00E5EB2D /* addImgId.png */,
 				2AF1C7881980154F0061A458 /* fshin.png */,
 				2AF1C7891980154F0061A458 /* jin1.png */,
 				2AF1C78A1980154F0061A458 /* jin2.png */,
@@ -760,6 +763,7 @@
 				88BC4D35190C6086002E5CC6 /* JSQMessagesLoadEarlierHeaderView.xib in Resources */,
 				8816A69B18E9250400111919 /* bubble_tailless@2x.png in Resources */,
 				2AF1C7911980154F0061A458 /* tanaka.png in Resources */,
+				2AC97CCD19C6A5FA00E5EB2D /* addImgId.png in Resources */,
 				88D1B0C9190604AF00AFE162 /* JSQMessagesTypingIndicatorFooterView.xib in Resources */,
 				8816A6B818E9250400111919 /* JSQMessagesToolbarContentView.xib in Resources */,
 				8816A69F18E9250400111919 /* message_sent.aiff in Resources */,
