@@ -117,16 +117,16 @@
 
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
-    return nil;
-//    if(section == 0){
-//        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 50)];
-//        header.backgroundColor = [UIColor redColor];
-//        return header;
-//    }else{
-//        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 10)];
-//        header.backgroundColor = [UIColor redColor];
-//        return header;
-//    }
+//    return nil;
+    if(section == 0){
+        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 50)];
+        header.backgroundColor = [UIColor redColor];
+        return header;
+    }else{
+        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 10)];
+        header.backgroundColor = [UIColor yellowColor];
+        return header;
+    }
 }
 
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section{
@@ -147,11 +147,16 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
-    if(section == 0 || section == 1){
-        return 1;
-    }else{
-        return 100;
-    }
+    return 1;
+//    if(section == 0 || section == 1){
+//        return 1;
+//    }else{
+//        return 100;
+//    }
+    
+    
+    
+    
 //    if(section == 0){
 //        return 10;
 //    }else{
