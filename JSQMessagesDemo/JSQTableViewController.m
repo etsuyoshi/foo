@@ -21,6 +21,9 @@
 //  arrIndivisualIdはaccount_idだけ->だめ!!!!
 //  arrIndivisualIdはuserInfo[account_id, name, timeLineId]
 
+
+//セルをchatousライクにする(左側にアイコン、中央上段にチャットid(もしくはname)、下段にステータス、右側に時間を設置
+
 #import "JSQTableViewController.h"
 #import "EditProfileTableViewController.h"
 
@@ -89,6 +92,10 @@
     isConnectMode = YES;
     
     
+    UINib *nib = [UINib nibWithNibName:@"JSQSelectIdTableViewCell" bundle:nil];
+    [self.tableView registerNib:nib forCellReuseIdentifier:@"selectIdCell"];//xibファイルidentifier名
+    
+    
     //画面下段に追加ボタンを設置
     [self addFooterView];
     
@@ -107,10 +114,6 @@
      }];
     
     
-    
-    
-    
-    
     self.title = @"チャット";
     NSLog(@"viewdidload at jsqTableView");
     
@@ -120,9 +123,11 @@
      initWithBarButtonSystemItem:UIBarButtonSystemItemEdit
      target:self
      action:@selector(edit)];
+    
     self.navigationItem.leftBarButtonItem = editButton;
-
+    
     //追加ボタンは画面下段中央部に設置(ナビゲーションから追加させないようにする)
+    
 //    UIBarButtonItem *addButton =
 //    [[UIBarButtonItem alloc]
 //     initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
@@ -135,7 +140,7 @@
     
     //合い言葉を設定するapiがまだない。
     //最終的にはtime_line_idからサーバー経由で合い言葉、chat相手のidを取得
-//    arrGroupId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
+    //arrGroupId = (NSMutableArray *)[CommonAPI getIdArray];//[NSMutableArray arrayWithObjects:@"しょうぎ", @"らーめん", @"ふうりゅう", nil];
     //以下account_idの文字列のみ格納された配列になっている
 //    NSArray *arrTmp = [[CommonAPI getIdArray] mutableCopy];//i.e.[NSMutableArray arrayWithObjects:@"taro", @"jiro",
     NSArray *arrTmp = [[CommonAPI getIdArray] mutableCopy];//i.e. factor -> [account_id, name, timeLineId]
@@ -162,6 +167,9 @@
 //    [[UITapGestureRecognizer alloc]
 //     initWithTarget:self action:@selector(closeSoftKeyboard)];
 //    [self.view addGestureRecognizer:gestureRecognizer];
+    
+
+    
 }
 
 -(void)viewDidAppear:(BOOL)animated{
@@ -181,6 +189,7 @@
     
     NSLog(@"timer validate");
     
+    [self.tableView reloadData];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -786,31 +795,83 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     }
 }
 
+-(CGFloat) tableView:(UITableView*)tableView heightForRowAtIndexPath:(NSIndexPath*)indexPath {
+//    JSQSelectIdTableViewCell *cell =
+//    (JSQSelectIdTableViewCell*)
+//    [self tableView:self.tableView cellForRowAtIndexPath:indexPath];
+    return 60;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"return : %d, %d", (int)indexPath.section, (int)indexPath.row);
-    static NSString *CellIdentifier = @"CellIdentifier";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    }
-    if(indexPath.section == 0){
-        NSLog(@"indexPath.sec%d, row%d = %@",
-              (int)indexPath.section,
-              (int)indexPath.row,
-              arrGroupId[indexPath.row]);
-        cell.textLabel.text = arrGroupId[indexPath.row][@"group_name"];//合い言葉 or Group_name?
-    }else{
-        NSLog(@"indexPath.sec%d, row%d = %@",
-              (int)indexPath.section,
-              (int)indexPath.row,
-              arrIndivisualId[indexPath.row]);
-//        cell.textLabel.text = arrIndivisualId[indexPath.row];//ID
-        cell.textLabel.text =
-        [NSString stringWithFormat:@"%@(%@)",
-         arrIndivisualId[indexPath.row][@"account_id"],
-         arrIndivisualId[indexPath.row][@"timeLineId"]];
+    
+//    http://www.techotopia.com/index.php/Using_Xcode_Storyboards_to_Build_Dynamic_TableViews_with_Prototype_Table_View_Cells
+    
+    static NSString *CellIdentifier = @"selectIdCell";//xibファイルのidentifier
+    UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+
+    
+    NSLog(@"cell.imvleft = %@", ((JSQSelectIdTableViewCell *)cell).imvLeft);
+    ((JSQSelectIdTableViewCell *)cell).imvLeft.layer.cornerRadius =
+    ((JSQSelectIdTableViewCell *)cell).imvLeft.bounds.size.width/2;//真円にするため半径設定
+    ((JSQSelectIdTableViewCell *)cell).imvLeft.layer.masksToBounds = YES;
+    ((JSQSelectIdTableViewCell *)cell).imvLeft.image = [UIImage imageNamed:@"takkun"];
+    ((JSQSelectIdTableViewCell *)cell).lblName.text = arrIndivisualId[indexPath.row][@"account_id"];
+    ((JSQSelectIdTableViewCell *)cell).lblMessage.text = @"hello";
+    ((JSQSelectIdTableViewCell *)cell).lblMessage.textColor = [UIColor grayColor];
+    ((JSQSelectIdTableViewCell *)cell).lblTime.text = @"00:00";
+    ((JSQSelectIdTableViewCell *)cell).lblTime.textColor = [UIColor grayColor];
+    NSLog(@"return cell = %@", cell);
+    
+    return cell;
+    
+    
+    if (indexPath.section == 0 ||
+        indexPath.section == 1) {
+        
+//        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+////        if (cell == nil) {
+////            UINib* nib = [UINib nibWithNibName:@"JSQSelectIdTableViewCell" bundle:nil];
+////            NSArray* array = [nib instantiateWithOwner:nil options:nil];
+////            cell = [array objectAtIndex:0];
+////            cell.editButton.layer.borderColor = [UIColor lightGrayColor].CGColor;
+////            cell.editButton.layer.borderWidth = 1.0;
+//            cell.imvLeft.image = [UIImage imageNamed:@"takkun"];
+//            cell.lblMessage.text = @"hello";
+//            cell.lblName.text = @"aho";
+//            cell.lblTime.text = @"00:00";
+////        }
+    
+            
+    
+    /////////test from this point
+    
+//    NSLog(@"return : %d, %d", (int)indexPath.section, (int)indexPath.row);
+//    static NSString *CellIdentifier = @"CellIdentifier";
+//    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+//    if (!cell) {
+//        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+//        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+//    }
+//    if(indexPath.section == 0){
+//        NSLog(@"indexPath.sec%d, row%d = %@",
+//              (int)indexPath.section,
+//              (int)indexPath.row,
+//              arrGroupId[indexPath.row]);
+//        cell.textLabel.text = arrGroupId[indexPath.row][@"group_name"];//合い言葉 or Group_name?
+//    }else{
+//        NSLog(@"indexPath.sec%d, row%d = %@",
+//              (int)indexPath.section,
+//              (int)indexPath.row,
+//              arrIndivisualId[indexPath.row]);
+////        cell.textLabel.text = arrIndivisualId[indexPath.row];//ID
+//        cell.textLabel.text =
+//        [NSString stringWithFormat:@"%@(%@)",
+//         arrIndivisualId[indexPath.row][@"account_id"],
+//         arrIndivisualId[indexPath.row][@"timeLineId"]];
+            
+            
+            //test until this point
         NSLog(@"aaa %i, %i",
               indexPath.section,
               indexPath.row);
