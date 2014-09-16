@@ -20,11 +20,14 @@
 
 #import "JSQDemoViewController.h"
 #import "JSQDemo2ViewController.h"
+#import "JSQSelectIdTableViewCell.h"
 
 @interface JSQTableViewController : UITableViewController
 <
 JSQDemoViewControllerDelegate
 , UITextFieldDelegate
+, UITableViewDelegate
+, UITableViewDataSource
 >
 
 @property (nonatomic, weak) NSTimer *timer;
