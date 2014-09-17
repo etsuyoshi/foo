@@ -30,6 +30,7 @@
 @implementation JSQTableViewController{
     NSMutableArray *arrGroupId;
     
+    UITableView *selectChatTable;
     
     //account_id, name, timeLineIdの組合せ辞書を一つの要素とする配列にする：arrIndivisualId済(名称はファクタリングした方が良い)
     //account_id文字列を要素とする配列にした方が初期開発段階のこのクラス上ではきれいになる(containObject等使用時)が、TL画面でtimeLineIdと紐づけられない
@@ -82,6 +83,18 @@
     [super viewDidLoad];
     
     
+    selectChatTable =
+    [[UITableView alloc]initWithFrame:
+     CGRectMake(0, 0, self.view.bounds.size.width,
+                self.view.bounds.size.height-200)
+                                style:UITableViewStyleGrouped];
+    selectChatTable.delegate = self;
+    selectChatTable.dataSource = self;
+    [self.view addSubview:selectChatTable];
+    
+    //有効でない？
+    //http://qiita.com/yimajo/items/7051af0919b5286aecfe
+    [UINavigationBar appearance].barTintColor = [UIColor colorWithRed:1.000 green:0.549 blue:0.890 alpha:1.000];
     
     //temporary:when reset : clear
 //    NSArray *array = [NSArray array];
@@ -93,7 +106,7 @@
     
     
     UINib *nib = [UINib nibWithNibName:@"JSQSelectIdTableViewCell" bundle:nil];
-    [self.tableView registerNib:nib forCellReuseIdentifier:@"selectIdCell"];//xibファイルidentifier名
+    [selectChatTable registerNib:nib forCellReuseIdentifier:@"selectIdCell"];//xibファイルidentifier名
     
     
     //画面下段に追加ボタンを設置
@@ -189,7 +202,7 @@
     
     NSLog(@"timer validate");
     
-    [self.tableView reloadData];
+    [selectChatTable reloadData];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -197,7 +210,6 @@
     [super viewWillAppear:animated];
     //[self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
     
-    [self.tableView reloadData];
     
     NSLog(@"finish viewwillappear");
 }
@@ -343,7 +355,6 @@
                     }
                 }
                 
-                
                 //メッセージがあれば内容をデバイスに一時的に保存してタイムラインに移動
                 NSLog(@"tableview : receivemessage = %@", userInfo);
             }else{
@@ -368,13 +379,13 @@
     [CommonAPI addMessage:msgInfo];
     
     
-    NSArray *testArrMessage = [CommonAPI getMessageArray];
-    NSMutableDictionary *testDictMessage = [[testArrMessage lastObject] mutableCopy];
-    
-    NSLog(@"メッセージを格納しました , last : %@", testDictMessage);
-    for(int i = 0;i < testArrMessage.count;i++){
-        NSLog(@"all message : %d : %@", i, testArrMessage[i]);
-    }
+//    NSArray *testArrMessage = [CommonAPI getMessageArray];
+//    NSMutableDictionary *testDictMessage = [[testArrMessage lastObject] mutableCopy];
+//    
+//    NSLog(@"メッセージを格納しました , last : %@", testDictMessage);
+//    for(int i = 0;i < testArrMessage.count;i++){
+//        NSLog(@"all message : %d : %@", i, testArrMessage[i]);
+//    }
     
     
     return;//テスト：以下本番では作る必要あり(時間なかったので後回し)
@@ -480,7 +491,8 @@
             //[commonAPIでデバイスsetする]
             [CommonAPI setIdArray:arrIndivisualId];
             
-            [self.tableView reloadData];
+            //[self.tableView reloadData];
+            [selectChatTable reloadData];
         }else{//メッセージ情報から取得したアカウントが格納されていない場合はそれを新たに作成してデバイスに保存する
             NSMutableDictionary *dictUserInfo = [NSMutableDictionary dictionary];
             dictUserInfo[@"account_id"] = strAccountId;
@@ -669,7 +681,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 }
 
 //上記determinAdd及びテキストフィールドから決定ボタンが押されたとき
--(void)determineAdd:(NSString *)strText{
+-(void)determineAdd:(NSString *)strText{//strTextは個人id
 
     NSLog(@"determine : text = %@", strText);
     
@@ -699,7 +711,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 //                 [arrIndivisualId addObject:userInfo[@"user"][@"account_id"]];
                  [arrIndivisualId addObject:userInfo[@"user"]];
                  NSLog(@"table add -> %@", userInfo[@"user"]);
-                 [self.tableView reloadData];
+//                 [self.tableView reloadData];
+                 [selectChatTable reloadData];
                  
                  
                  //ダイアログの表示
@@ -808,7 +821,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 //    http://www.techotopia.com/index.php/Using_Xcode_Storyboards_to_Build_Dynamic_TableViews_with_Prototype_Table_View_Cells
     
     static NSString *CellIdentifier = @"selectIdCell";//xibファイルのidentifier
-    UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 
     
     NSLog(@"cell.imvleft = %@", ((JSQSelectIdTableViewCell *)cell).imvLeft);
@@ -817,7 +830,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     ((JSQSelectIdTableViewCell *)cell).imvLeft.layer.masksToBounds = YES;
     ((JSQSelectIdTableViewCell *)cell).imvLeft.image = [UIImage imageNamed:@"takkun"];
     ((JSQSelectIdTableViewCell *)cell).lblName.text = arrIndivisualId[indexPath.row][@"account_id"];
-    ((JSQSelectIdTableViewCell *)cell).lblMessage.text = @"hello";
+    ((JSQSelectIdTableViewCell *)cell).lblMessage.text = [self getLastMessageWithId:arrIndivisualId[indexPath.row][@"account_id"]];
     ((JSQSelectIdTableViewCell *)cell).lblMessage.textColor = [UIColor grayColor];
     ((JSQSelectIdTableViewCell *)cell).lblTime.text = @"00:00";
     ((JSQSelectIdTableViewCell *)cell).lblTime.textColor = [UIColor grayColor];
@@ -829,18 +842,6 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     if (indexPath.section == 0 ||
         indexPath.section == 1) {
         
-//        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-////        if (cell == nil) {
-////            UINib* nib = [UINib nibWithNibName:@"JSQSelectIdTableViewCell" bundle:nil];
-////            NSArray* array = [nib instantiateWithOwner:nil options:nil];
-////            cell = [array objectAtIndex:0];
-////            cell.editButton.layer.borderColor = [UIColor lightGrayColor].CGColor;
-////            cell.editButton.layer.borderWidth = 1.0;
-//            cell.imvLeft.image = [UIImage imageNamed:@"takkun"];
-//            cell.lblMessage.text = @"hello";
-//            cell.lblName.text = @"aho";
-//            cell.lblTime.text = @"00:00";
-////        }
     
             
     
@@ -1128,8 +1129,6 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     [UIColor colorWithRed:1 green:1 blue:1 alpha:0];
     
     UIButton *buttonAdd = [UIButton buttonWithType:UIButtonTypeCustom];
-//    buttonAdd.imageView = [[UIImageView alloc]initWithImage:
-//                           [UIImage imageNamed:@"imgAddId"]];
     [buttonAdd setImage:[UIImage imageNamed:@"addImgId"]
                forState:UIControlStateNormal];
     buttonAdd.frame =
@@ -1140,10 +1139,22 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
                   action:@selector(addInputId)
         forControlEvents:UIControlEventTouchUpInside];
     [viewFooter addSubview:buttonAdd];
-//
+    
     [self.view addSubview:viewFooter];
     
     NSLog(@"add footer view finished");
+}
+
+-(NSString *)getLastMessageWithId:(NSString *)strId{
+    NSArray *arrMessageTmp = [CommonAPI getMessageArray];
+    for(int i = (int)arrMessageTmp.count-1;i >= 0;i--){
+        NSLog(@"message %d = %@", i, arrMessageTmp[i]);
+        if([arrMessageTmp[i][@"account_id"] isEqualToString:strId]){
+            NSLog(@"return %d is %@", i, arrMessageTmp[i][@"message"]);
+            return arrMessageTmp[i][@"message"];
+        }
+    }
+    return nil;
 }
 
 @end
