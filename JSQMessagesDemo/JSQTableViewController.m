@@ -355,6 +355,7 @@
                     }
                 }
                 
+                [selectChatTable reloadData];
                 //メッセージがあれば内容をデバイスに一時的に保存してタイムラインに移動
                 NSLog(@"tableview : receivemessage = %@", userInfo);
             }else{
@@ -1154,6 +1155,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
             return arrMessageTmp[i][@"message"];
         }
     }
+    arrMessageTmp = nil;//メモリ解放
     return nil;
 }
 
