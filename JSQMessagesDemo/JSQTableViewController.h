@@ -22,7 +22,8 @@
 #import "JSQDemo2ViewController.h"
 #import "JSQSelectIdTableViewCell.h"
 
-@interface JSQTableViewController : UITableViewController
+@interface JSQTableViewController : UIViewController
+//UITableViewController
 <
 JSQDemoViewControllerDelegate
 , UITextFieldDelegate
