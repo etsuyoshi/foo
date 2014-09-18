@@ -50,6 +50,11 @@
     
     //フッタービュー：相手を追加するボタン設置
     UIView *viewFooter;
+    int heightOfFooter;
+    int diameterButton;
+
+    
+    NSArray *arrIcon;
     
     //キーボード関連
 //    UIView *viewTable;
@@ -82,19 +87,35 @@
     
     [super viewDidLoad];
     
+    arrIcon = [NSArray arrayWithObjects:
+               @"butterfly",
+               @"elephant",
+               @"fishes",
+               @"ladybird",
+               @"panda",
+               @"rabbit",
+               @"squirrel",
+               nil];
+    
+    heightOfFooter = 60;
+    diameterButton = 55;
+
     
     selectChatTable =
     [[UITableView alloc]initWithFrame:
      CGRectMake(0, 0, self.view.bounds.size.width,
-                self.view.bounds.size.height-200)
+                self.view.bounds.size.height-heightOfFooter)
                                 style:UITableViewStyleGrouped];
     selectChatTable.delegate = self;
     selectChatTable.dataSource = self;
     [self.view addSubview:selectChatTable];
     
-    //有効でない？
     //http://qiita.com/yimajo/items/7051af0919b5286aecfe
-    [UINavigationBar appearance].barTintColor = [UIColor colorWithRed:1.000 green:0.549 blue:0.890 alpha:1.000];
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:0.000 green:0.549 blue:0.890 alpha:1.000];
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    [self.navigationController.navigationBar
+     setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor whiteColor]}];
+    self.navigationController.navigationBar.translucent = NO;
     
     //temporary:when reset : clear
 //    NSArray *array = [NSArray array];
@@ -128,6 +149,7 @@
     
     
     self.title = @"チャット";
+
     NSLog(@"viewdidload at jsqTableView");
     
     
@@ -829,7 +851,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     ((JSQSelectIdTableViewCell *)cell).imvLeft.layer.cornerRadius =
     ((JSQSelectIdTableViewCell *)cell).imvLeft.bounds.size.width/2;//真円にするため半径設定
     ((JSQSelectIdTableViewCell *)cell).imvLeft.layer.masksToBounds = YES;
-    ((JSQSelectIdTableViewCell *)cell).imvLeft.image = [UIImage imageNamed:@"takkun"];
+    ((JSQSelectIdTableViewCell *)cell).imvLeft.image =
+    [UIImage imageNamed:arrIcon[indexPath.row % arrIcon.count]];
     ((JSQSelectIdTableViewCell *)cell).lblName.text = arrIndivisualId[indexPath.row][@"account_id"];
     ((JSQSelectIdTableViewCell *)cell).lblMessage.text = [self getLastMessageWithId:arrIndivisualId[indexPath.row][@"account_id"]];
     ((JSQSelectIdTableViewCell *)cell).lblMessage.textColor = [UIColor grayColor];
@@ -986,25 +1009,36 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
                      NSURLSessionDataTask *task,
                      NSError *error){
              NSLog(@"userInfo at findusers at tableView : %@", userInfo);
-             NSArray *arrUsers = [NSArray arrayWithObjects:userInfo[@"user"], nil];
-             NSLog(@"arrUsers.count = %d, contents = %@", (int)arrUsers.count, arrUsers);
-             //該当者が存在すれば
-             if((int)arrUsers.count > 0){
-                 JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
-                 vc.arrTimeLineUsers = arrUsers;
-                 //timeLineIdが発行されている場合は入力されている(未入力の場合はnil)
-                 vc.strTimeLineId = arrIndivisualId[indexPath.row][@"timeLineId"];
-                 if(arrIndivisualId[indexPath.row][@"name"] == nil ||
-                    [arrIndivisualId[indexPath.row][@"name"] isEqual:[NSNull null]]){
-                     vc.title = arrIndivisualId[indexPath.row][@"name"];
-                 }else{
-                     vc.title = arrIndivisualId[indexPath.row][@"account_name"];
+             NSArray *arrUsers = nil;//userInfo[@"user"];
+             
+             //arrUsersにはtimelineに属する全ユーザー情報を付与する
+             //ここではaccountId一人のみだが、グループチャットする場合には複数登録をする必要がある
+             if(userInfo[@"user"] != nil &&
+                ![userInfo[@"user"] isEqual:[NSNull null]]){
+                 NSLog(@"userはヌルではない : %@", userInfo[@"user"]);
+                 arrUsers = [NSArray arrayWithObjects:userInfo[@"user"], nil];
+//             [NSArray arrayWithObjects:userInfo[@"user"], nil];
+             
+                 //該当者が存在すれば
+                 if((int)arrUsers.count > 0){//実際にはカウンターがゼロのことはない：該当idがなければarrUsersの要素にnullが格納されているため
+                     
+                     NSLog(@"arrUsers.count = %d, contents = %@", (int)arrUsers.count, arrUsers);
+                     JSQDemoViewController *vc = [JSQDemoViewController messagesViewController];
+                     vc.arrTimeLineUsers = arrUsers;
+                     //timeLineIdが発行されている場合は入力されている(未入力の場合はnil)
+                     vc.strTimeLineId = arrIndivisualId[indexPath.row][@"timeLineId"];
+                     if(arrIndivisualId[indexPath.row][@"name"] == nil ||
+                        [arrIndivisualId[indexPath.row][@"name"] isEqual:[NSNull null]]){
+                         vc.title = arrIndivisualId[indexPath.row][@"name"];
+                     }else{
+                         vc.title = arrIndivisualId[indexPath.row][@"account_id"];
+                     }
+                     [timer invalidate];//タイマー停止
+                     NSLog(@"tableview : タイマーを停止");
+                     NSLog(@"vc.timelineusers = %@", vc.arrTimeLineUsers);
+                     [self.navigationController pushViewController:vc animated:YES];
+                     
                  }
-                 [timer invalidate];//タイマー停止
-                 NSLog(@"tableview : タイマーを停止");
-                 NSLog(@"vc.timelineusers = %@", vc.arrTimeLineUsers);
-                 [self.navigationController pushViewController:vc animated:YES];
-                 
              }else{
                  //該当者が存在しない
                  NSString *strNoManMessage =
@@ -1112,19 +1146,17 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 -(void)addFooterView{
     
     NSLog(@"add footer view");
-    int heightOfHeader = 60;
-    int diameterButton = 55;
     //画面サイズ自体がnavigationBarによって下にずれているのでその分を上位置に調整してあげる必要がある
     //テザリング等によりstatusBarの高さが変わる場合(未対応)http://dendrocopos.jp/wp/archives/298
     viewFooter =
     [[UIView alloc]
     initWithFrame:
     CGRectMake(0,
-               self.view.bounds.size.height - heightOfHeader -
+               self.view.bounds.size.height - heightOfFooter -
                self.navigationController.navigationBar.bounds.size.height -
                [UIApplication sharedApplication].statusBarFrame.size.height,
                self.view.bounds.size.width,
-               heightOfHeader)];
+               heightOfFooter)];
     
     viewFooter.backgroundColor =
     [UIColor colorWithRed:1 green:1 blue:1 alpha:0];
@@ -1134,7 +1166,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
                forState:UIControlStateNormal];
     buttonAdd.frame =
     CGRectMake((self.view.bounds.size.width - diameterButton)/2,
-               (heightOfHeader / diameterButton)/2,
+               (heightOfFooter / diameterButton)/2,
                diameterButton, diameterButton);
     [buttonAdd addTarget:self
                   action:@selector(addInputId)
