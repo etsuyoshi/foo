@@ -115,7 +115,8 @@
         
         //既に格納されているタイムラインユーザーとの照合
         for(int j = 0;j < self.arrTimeLineUsers.count;j++){
-            
+            NSLog(@"i = %d, %@", i, arrMessage[i][@"account_id"]);
+            NSLog(@"j = %@", self.arrTimeLineUsers);
             if([arrMessage[i][@"account_id"] isEqualToString:self.arrTimeLineUsers[j][@"account_id"] ]){
                 //↑正しいか分からない
                 NSLog(@"照合！！！！");
@@ -254,7 +255,7 @@
     strDeviceKey = store[@"device_key"];
     store = nil;
     
-    self.title = @"base time line";
+//    self.title = @"base time line";
     
     self.sender = @"myself defined in view didload";
     
@@ -795,8 +796,8 @@
                  }
              }
              NSLog(@"userinfo[succeed]=%d", [userInfo[@"succeed"] intValue]);
-             [SVProgressHUD showSuccessWithStatus:@"送信しました!"];
-             [SVProgressHUD showSuccessWithStatus:[NSString stringWithFormat:@"%@", userInfo]];
+//             [SVProgressHUD showSuccessWithStatus:@"送信しました!"];
+//             [SVProgressHUD showSuccessWithStatus:[NSString stringWithFormat:@"%@", userInfo]];
              NSLog(@"userinfo = %@", userInfo);
              [self.messages addObject:message];
              [self finishSendingMessage];

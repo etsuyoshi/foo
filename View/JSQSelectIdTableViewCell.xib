@@ -22,14 +22,8 @@
                             <constraint firstAttribute="width" constant="50" id="jTg-AC-R4U"/>
                         </constraints>
                     </imageView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SaC-uv-FGW">
-                        <rect key="frame" x="209" y="8" width="42" height="21"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hJN-bg-eJq">
-                        <rect key="frame" x="209" y="137" width="42" height="21"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SaC-uv-FGW">
+                        <rect key="frame" x="133" y="8" width="42" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
@@ -40,13 +34,19 @@
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hJN-bg-eJq">
+                        <rect key="frame" x="133" y="137" width="42" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottomMargin" secondItem="hJN-bg-eJq" secondAttribute="bottom" id="0cU-X6-k9d"/>
-                    <constraint firstAttribute="centerX" secondItem="SaC-uv-FGW" secondAttribute="centerX" id="Ag9-rj-LWA"/>
+                    <constraint firstItem="hJN-bg-eJq" firstAttribute="leading" secondItem="udB-6h-sbk" secondAttribute="trailing" constant="8" id="6P7-m2-Ec0"/>
                     <constraint firstAttribute="centerY" secondItem="tgd-Th-fRe" secondAttribute="centerY" id="Fnb-Bf-zrp"/>
                     <constraint firstItem="udB-6h-sbk" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="-8" id="Onp-NU-yXE"/>
-                    <constraint firstAttribute="centerX" secondItem="hJN-bg-eJq" secondAttribute="centerX" id="V5W-Vc-rxe"/>
+                    <constraint firstItem="SaC-uv-FGW" firstAttribute="leading" secondItem="udB-6h-sbk" secondAttribute="trailing" constant="8" id="XJA-Pl-l3Z"/>
                     <constraint firstAttribute="centerY" secondItem="udB-6h-sbk" secondAttribute="centerY" id="dNm-c9-rg1"/>
                     <constraint firstItem="SaC-uv-FGW" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" id="gjm-n7-xpF"/>
                     <constraint firstItem="tgd-Th-fRe" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailingMargin" id="xWU-nL-aFb"/>
@@ -58,7 +58,7 @@
                 <outlet property="lblName" destination="SaC-uv-FGW" id="c4l-pt-DvL"/>
                 <outlet property="lblTime" destination="tgd-Th-fRe" id="pVg-N8-bLJ"/>
             </connections>
-            <point key="canvasLocation" x="443" y="241.5"/>
+            <point key="canvasLocation" x="354" y="213.5"/>
         </tableViewCell>
     </objects>
 </document>
