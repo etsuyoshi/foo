@@ -815,19 +815,19 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if(section == 0){
-        NSLog(@"arrgroup = %d", arrGroupId.count);
+        NSLog(@"arrgroup = %d", (int)arrGroupId.count);
         return arrGroupId.count;
     }else{
-        NSLog(@"arrind = %d", arrIndivisualId.count);
+        NSLog(@"arrind = %d", (int)arrIndivisualId.count);
         return  arrIndivisualId.count;
     }
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     if(section == 0){
-        return @"あいことば";
+        return @"グループ";
     }else{
-        return @"id";
+        return @"個室";
     }
 }
 
@@ -853,10 +853,15 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     ((JSQSelectIdTableViewCell *)cell).imvLeft.layer.masksToBounds = YES;
     ((JSQSelectIdTableViewCell *)cell).imvLeft.image =
     [UIImage imageNamed:arrIcon[indexPath.row % arrIcon.count]];
-    ((JSQSelectIdTableViewCell *)cell).lblName.text = arrIndivisualId[indexPath.row][@"account_id"];
-    ((JSQSelectIdTableViewCell *)cell).lblMessage.text = [self getLastMessageWithId:arrIndivisualId[indexPath.row][@"account_id"]];
+    ((JSQSelectIdTableViewCell *)cell).lblName.text =
+    arrIndivisualId[indexPath.row][@"account_id"];
+    ((JSQSelectIdTableViewCell *)cell).lblMessage.text =
+    [self getLastMessageWithId:arrIndivisualId[indexPath.row][@"account_id"]];
+    ((JSQSelectIdTableViewCell *)cell).lblMessage.font = [UIFont systemFontOfSize:15];
     ((JSQSelectIdTableViewCell *)cell).lblMessage.textColor = [UIColor grayColor];
-    ((JSQSelectIdTableViewCell *)cell).lblTime.text = @"00:00";
+    ((JSQSelectIdTableViewCell *)cell).lblTime.text =
+    [self getLastTimeWithId:arrIndivisualId[indexPath.row][@"account_id"]];
+    ((JSQSelectIdTableViewCell *)cell).lblTime.font = [UIFont systemFontOfSize:15];
     ((JSQSelectIdTableViewCell *)cell).lblTime.textColor = [UIColor grayColor];
     NSLog(@"return cell = %@", cell);
     
@@ -1178,13 +1183,28 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     NSLog(@"add footer view finished");
 }
 
+/*
+ *既に格納されたメッセージ配列を最後から検索して該当するstrIdのキーとなるmessage要素を返す
+ */
 -(NSString *)getLastMessageWithId:(NSString *)strId{
     NSArray *arrMessageTmp = [CommonAPI getMessageArray];
     for(int i = (int)arrMessageTmp.count-1;i >= 0;i--){
-        NSLog(@"message %d = %@", i, arrMessageTmp[i]);
+//        NSLog(@"message %d = %@", i, arrMessageTmp[i]);
         if([arrMessageTmp[i][@"account_id"] isEqualToString:strId]){
             NSLog(@"return %d is %@", i, arrMessageTmp[i][@"message"]);
             return arrMessageTmp[i][@"message"];
+        }
+    }
+    arrMessageTmp = nil;//メモリ解放
+    return nil;
+}
+-(NSString *)getLastTimeWithId:(NSString *)strId{
+    NSArray *arrMessageTmp = [CommonAPI getMessageArray];
+    for(int i = (int)arrMessageTmp.count-1;i >= 0;i--){
+//        NSLog(@"message %d = %@", i, arrMessageTmp[i]);
+        if([arrMessageTmp[i][@"account_id"] isEqualToString:strId]){
+            NSLog(@"return %d is %@", i, arrMessageTmp[i][@"created"]);
+            return arrMessageTmp[i][@"created"];
         }
     }
     arrMessageTmp = nil;//メモリ解放
