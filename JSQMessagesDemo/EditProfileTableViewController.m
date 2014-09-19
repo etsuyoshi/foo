@@ -20,16 +20,18 @@
     UITextField *tfName;
     UITextField *tfAccountId;
     
+    
+    UITableView *mainTableView;
 }
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
+//- (id)initWithStyle:(UITableViewStyle)style
+//{
+//    self = [super initWithStyle:style];
+//    if (self) {
+//        // Custom initialization
+//    }
+//    return self;
+//}
 
 - (void)viewDidLoad
 {
@@ -69,16 +71,21 @@
     
 //    self.title = store[@"]
     
-    self.tableView.separatorColor = [UIColor clearColor];
-    self.tableView.alwaysBounceVertical = NO;
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"CellIdentifier"];
+    mainTableView = [[UITableView alloc]initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
+    mainTableView.tableHeaderView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"panda"]];
+    mainTableView.delegate = self;
+    mainTableView.dataSource = self;
+    mainTableView.separatorColor = [UIColor clearColor];
+    mainTableView.alwaysBounceVertical = NO;
+    [mainTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"CellIdentifier"];
+    [self.view addSubview:mainTableView];
     
     
 }
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     
-    [self.tableView reloadData];
+    [mainTableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning
@@ -140,7 +147,7 @@
 
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
     if(section ==0){
-        return 50;
+        return 1;
     }else{
         return 10;
     }
@@ -167,7 +174,6 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if(indexPath.section == 2){//button
-        NSLog(@"aaa");
         
         [self saveInfo];
     }
