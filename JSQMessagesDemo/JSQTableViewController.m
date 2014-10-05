@@ -343,11 +343,11 @@
                 int numOfMessages = (int)((NSArray *)userInfo[@"messages"]).count;
                 if(numOfMessages == 0){
                     NSLog(@"メッセージはありません");
-                    //test
-                    [self receiveMessageView:
-                     [NSString stringWithFormat:@"no message %@",
-                      [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"]]
-                     ];
+                    //test:何もメッセージがないことを示す赤いビュー
+//                    [self receiveMessageView:
+//                     [NSString stringWithFormat:@"no message %@",
+//                      [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"]]
+//                     ];
                 }else{
                     NSLog(@"メッセージを受信しました");
                     //受信した全てのメッセージに対して
@@ -825,7 +825,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     if(section == 0){
-        return @"グループ";
+//        return @"グループ";
+        return nil;
     }else{
         return @"個室";
     }
@@ -1079,7 +1080,6 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
 }
 
 
-//?
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 //    if(tableView == tableViewA)
@@ -1166,19 +1166,43 @@ clickedButtonAtIndex:(NSInteger)buttonIndex{
     viewFooter.backgroundColor =
     [UIColor colorWithRed:1 green:1 blue:1 alpha:0];
     
-    UIButton *buttonAdd = [UIButton buttonWithType:UIButtonTypeCustom];
-    [buttonAdd setImage:[UIImage imageNamed:@"addImgId"]
+    
+    //個人idの追加
+    UIButton *btnIndivisualAdd = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btnIndivisualAdd setImage:[UIImage imageNamed:@"addImgId"]
                forState:UIControlStateNormal];
-    buttonAdd.frame =
+    btnIndivisualAdd.frame =
+//    CGRectMake(0, 0, diameterButton, diameterButton);
+//    btnIndivisualAdd.center = CGPointMake(self.view.bounds.size.width/4,
+//                                   diameterButton/2);
     CGRectMake((self.view.bounds.size.width - diameterButton)/2,
                (heightOfFooter / diameterButton)/2,
                diameterButton, diameterButton);
-    [buttonAdd addTarget:self
+    [btnIndivisualAdd addTarget:self
                   action:@selector(addInputId)
         forControlEvents:UIControlEventTouchUpInside];
-    [viewFooter addSubview:buttonAdd];
-    
+    [viewFooter addSubview:btnIndivisualAdd];
     [self.view addSubview:viewFooter];
+    
+    
+//    //グループidの追加
+//    UIButton *btnGroupAdd = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [btnGroupAdd setImage:[UIImage imageNamed:@"addImgId"]//group用のメソッドに設定しなくてはいけないよ！！！！！！！！！！！
+//               forState:UIControlStateNormal];
+//    btnGroupAdd.frame = CGRectMake(0, 0, diameterButton, diameterButton);
+//    btnGroupAdd.center = CGPointMake(self.view.bounds.size.width*3/4,
+//                                   diameterButton/2);
+//    //    CGRectMake((self.view.bounds.size.width - diameterButton)/2,
+//    //               (heightOfFooter / diameterButton)/2,
+//    //               diameterButton, diameterButton);
+//    [btnGroupAdd addTarget:self
+//                  action:@selector(addInputId)
+//        forControlEvents:UIControlEventTouchUpInside];
+//    [viewFooter addSubview:btnGroupAdd];
+//    
+//    [self.view addSubview:viewFooter];
+
+    
     
     NSLog(@"add footer view finished");
 }

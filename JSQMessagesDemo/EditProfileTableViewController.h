@@ -8,7 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface EditProfileTableViewController : UIViewController<UITextFieldDelegate,UITableViewDataSource,UITableViewDelegate>
+@interface EditProfileTableViewController : UIViewController
+<UITextFieldDelegate,
+UITableViewDataSource,
+UITableViewDelegate,
+UITextViewDelegate>
 
 //@property (nonatomic , weak) UITableView *mainTableView;
 

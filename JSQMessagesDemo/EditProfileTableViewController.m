@@ -7,6 +7,10 @@
 //
 
 #import "EditProfileTableViewController.h"
+#import "PlaceHolderTextView.h"
+
+
+#define HEIGHT_ORDINARY_CELL 40
 
 @interface EditProfileTableViewController ()
 
@@ -17,8 +21,18 @@
     NSString *name;
     NSString *deviceKey;
     
+    //indexPath.section=0
     UITextField *tfName;
     UITextField *tfAccountId;
+    
+    //indexPath.section=1
+    UIButton *btnGender;
+    UIButton *btnAddress;
+    NSArray *arrStrGender;//性別：女性・男性
+    int intGender;//0:女性・1:男性
+    NSArray *arrColorGender;
+//    UITextView *tvIntro;
+    PlaceHolderTextView *tvIntro;
     
     
     UITableView *mainTableView;
@@ -37,9 +51,23 @@
 {
     [super viewDidLoad];
     
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
     self.title =
-    [NSString stringWithFormat:@"設定(%@)",
-     [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"device_key"]];
+    @"設定";
+//    [NSString stringWithFormat:@"設定(%@)",
+//     store[@"device_key"]];
+    
+    
+    
+    //各種設定
+    arrStrGender = [NSArray arrayWithObjects:@"女性", @"男性", nil];
+    arrColorGender = [NSArray arrayWithObjects:
+                      [UIColor redColor],
+                      [UIColor blueColor],
+                      nil];
+    intGender = 0;//本来的にはuickeychainstoreから取得する
+    
+    
     NSLog(@"viewdidload at editprodileViewCon : key = %@",
           [UICKeyChainStore keyChainStoreWithService:@"ichat"]);
     
@@ -75,12 +103,18 @@
     mainTableView.tableHeaderView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"panda"]];
     mainTableView.delegate = self;
     mainTableView.dataSource = self;
-    mainTableView.separatorColor = [UIColor clearColor];
-    mainTableView.alwaysBounceVertical = NO;
+//    mainTableView.userInteractionEnabled = NO;//これをやるとサブビューの挙動も抑制されてしまう
+//    mainTableView.separatorColor = [UIColor clearColor];
+    mainTableView.alwaysBounceVertical = YES;
+//    mainTableView.contentSize =
+//    CGSizeMake(self.view.bounds.size.width,
+//               self.view.bounds.size.height*2);
     [mainTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"CellIdentifier"];
+    
     [self.view addSubview:mainTableView];
     
     
+    store = nil;
 }
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
@@ -105,14 +139,19 @@
 {
 //#warning Potentially incomplete method implementation.
     // Return the number of sections.
-    return 3;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 //#warning Incomplete method implementation.
     // Return the number of rows in the section.
-    return 1;
+//    return 1;
+    if(section == 0){
+        return 2;//account_name,account_id
+    }else{
+        return 3;
+    }
 }
 
 //-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
@@ -126,13 +165,20 @@
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
 //    return nil;
     if(section == 0){
-        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 50)];
-        header.backgroundColor = [UIColor redColor];
-        return header;
+//        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 50)];
+//        header.backgroundColor = [UIColor redColor];
+//        return header;
+//    }else{
+//        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 10)];
+//        header.backgroundColor = [UIColor yellowColor];
+//        return header;
+        UIView *headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 10)];
+        headerView.backgroundColor = [UIColor grayColor];
+        return headerView;
     }else{
-        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 10)];
-        header.backgroundColor = [UIColor yellowColor];
-        return header;
+        UIView *headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 10)];
+        headerView.backgroundColor = [UIColor grayColor];
+        return headerView;
     }
 }
 
@@ -144,12 +190,28 @@
     return nil;
 
 }
-
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(indexPath.section == 0){
+        //account_idとaccount_nameの両方
+        return HEIGHT_ORDINARY_CELL;
+    }else if(indexPath.section == 1){
+        if(indexPath.section == 1){
+            if(indexPath.row == 0){//性別入力
+                return HEIGHT_ORDINARY_CELL;
+            }
+            if(indexPath.row == 1){//自己紹介
+                return HEIGHT_ORDINARY_CELL*3;//３行まで入力させる
+            }
+        }
+    }
+    
+    return 0;
+}
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
     if(section ==0){
-        return 1;
+        return 2;
     }else{
-        return 10;
+        return 2;
     }
 }
 
@@ -174,8 +236,8 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if(indexPath.section == 2){//button
-        
-        [self saveInfo];
+        //戻るボタンで一旦保存する
+//        [self saveInfo];
     }
 }
 
@@ -186,6 +248,8 @@
     [tableView
      dequeueReusableCellWithIdentifier:@"CellIdentifier"
      forIndexPath:indexPath];
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;//タップしても反応しないようにする
     
     //ツールバーを生成
     UIToolbar *toolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 44)];
@@ -201,7 +265,7 @@
      initWithTitle:@"次へ"
      style:UIBarButtonItemStylePlain
      target:self action:@selector(nextTextFieldActivate:)];
-    _commitBtn.tag = indexPath.row;
+    _commitBtn.tag = [[NSString stringWithFormat:@"%d%d", (int)indexPath.section, (int)indexPath.row] integerValue];
     // ボタンをToolbarに設定
     NSArray *toolBarItems = [NSArray arrayWithObjects:spacer, _commitBtn, nil];
     // 表示・非表示の設定
@@ -209,47 +273,99 @@
     
     cell.textLabel.font = [UIFont boldSystemFontOfSize:14];
     
-    
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
     
     
     if(indexPath.section == 0){
-        tfName = [[UITextField alloc]initWithFrame:CGRectMake(0, 0, 200, cell.bounds.size.height)];
-        [cell.contentView addSubview:tfName];
         
+        if(indexPath.row == 0){
+            tfName = [[UITextField alloc]initWithFrame:CGRectMake(0, 0, 200, cell.bounds.size.height)];
+            [cell.contentView addSubview:tfName];
+            
+            
+            
+            tfName.delegate = self;
+            tfName.placeholder = store[@"name"];
+            NSLog(@"placeholder(%d) = %@", (int)indexPath.section, tfName.placeholder);
+            tfName.tag = indexPath.section;
+            tfName.inputAccessoryView = toolBar;
+            
+            
+            
+            cell.accessoryView = tfName;
+            cell.textLabel.text = @"アカウント名";
+            
+//            tfName = nil;
         
+        }else if(indexPath.row == 1){
+            tfAccountId = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 200, cell.bounds.size.height)];
+            [cell.contentView addSubview:tfAccountId];
+            
+            
+            
+            tfAccountId.delegate = self;
+            tfAccountId.placeholder = store[@"account_id"];
+            NSLog(@"placeholder(%d) = %@", (int)indexPath.section, tfAccountId.placeholder);
+            tfAccountId.tag = indexPath.section;
+            tfAccountId.inputAccessoryView = toolBar;
+            
+            
+            
+            cell.accessoryView = tfAccountId;
+            cell.textLabel.text = @"アカウントID";
+            
+//            tfAccountId = nil;
+        }
         
-        tfName.delegate = self;
-        tfName.placeholder = [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"];
-        NSLog(@"placeholder(%d) = %@", indexPath.section, tfName.placeholder);
-        tfName.tag = indexPath.section;
-        tfName.inputAccessoryView = toolBar;
-        
-        
-        
-        cell.accessoryView = tfName;
-        cell.textLabel.text = @"アカウント名";
-        
-        
+        store = nil;
         return cell;
     }
     
     if(indexPath.section == 1){
-        tfAccountId = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 200, cell.bounds.size.height)];
-        [cell.contentView addSubview:tfAccountId];
-        
-        
-        
-        tfAccountId.delegate = self;
-        tfAccountId.placeholder = [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"];
-        NSLog(@"placeholder(%d) = %@", indexPath.section, tfAccountId.placeholder);
-        tfAccountId.tag = indexPath.section;
-        tfAccountId.inputAccessoryView = toolBar;
-        
-        
-        
-        cell.accessoryView = tfAccountId;
-        cell.textLabel.text = @"アカウントID";
-        
+        if(indexPath.row == 0){
+            //性別
+            btnGender = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 120, 30)];
+            btnGender.center = CGPointMake(self.view.bounds.size.width/2,
+                                           HEIGHT_ORDINARY_CELL/2);
+            btnGender.backgroundColor = [UIColor whiteColor];
+            btnGender.layer.borderWidth = 2.0f;
+            btnGender.layer.borderColor =
+            [(UIColor *)arrColorGender[intGender] CGColor];//[[UIColor redColor] CGColor];
+            btnGender.layer.cornerRadius = 10.0f;
+    //        [btnGender setTitle:arrGender[intGender] forState:UIControlStateNormal];
+            [btnGender setTitle:arrStrGender[intGender] forState:UIControlStateNormal];
+            [btnGender setTitleColor:arrColorGender[intGender] forState:UIControlStateNormal];
+            [btnGender addTarget:self action:@selector(tapBtnGenderChange:) forControlEvents:UIControlEventTouchUpInside];
+            [cell.contentView addSubview:btnGender];
+            
+            
+            
+        }else if(indexPath.row == 1){
+            //自己紹介
+//            tvIntro = [[UITextView alloc]
+//                       initWithFrame:
+//                       CGRectMake(10, 0, self.view.bounds.size.width-20,
+//                                  HEIGHT_ORDINARY_CELL*3)];
+//            tvIntro.userInteractionEnabled = YES;
+//            tvIntro.editable = YES;
+//            tvIntro.delegate = self;
+//            tvIntro.inputAccessoryView = toolBar;
+//
+////        textContainer:<#(NSTextContainer *)#>
+//            [cell.contentView addSubview:tvIntro];
+            tvIntro = [[PlaceHolderTextView alloc]
+                       initWithFrame:CGRectMake(10, 0, self.view.bounds.size.width-20,
+                                                HEIGHT_ORDINARY_CELL*3)];
+            tvIntro.placeholder         = @"自己紹介文を入力してください";
+            tvIntro.placeholderColor = [UIColor grayColor];
+            tvIntro.userInteractionEnabled = YES;
+            tvIntro.editable = YES;
+            tvIntro.delegate = self;
+            tvIntro.inputAccessoryView = toolBar;
+            
+            [cell.contentView addSubview:tvIntro];
+            
+        }
         return cell;
     }
     
@@ -267,6 +383,8 @@
         cell.textLabel.text = @"変更を反映する";
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
         cell.textLabel.textColor = [UIColor blackColor];
+        
+        store = nil;
         return  cell;
     }
     
@@ -280,38 +398,39 @@
     
     [self.view endEditing:YES];
     
+    UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
     //testのためコメントアウト
     NSLog(@"tfName=%@, keychain=%@",
           tfName.text,
-          [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"]);
+          store[@"name"]);
     NSLog(@"tfAccountId=%@, keychain=%@",
           tfAccountId.text,
-          [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"]);
+          store[@"account_id"]);
     
     //両方が既に保存されているものと同じかもしくはnullかどうか判定
     if((
        tfName.text == nil || [tfName.text isEqual:[NSNull null]] ||
        [tfName.text isEqualToString:@""] ||
-       [tfName.text isEqualToString:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"]])
+       [tfName.text isEqualToString:store[@"name"]])
        
        &&(
        tfAccountId.text == nil || [tfAccountId.text isEqual:[NSNull null]] ||
        [tfAccountId.text isEqualToString:@""] ||
-       [tfAccountId.text isEqualToString:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"]])
+       [tfAccountId.text isEqualToString:store[@"account_id"]])
        ){
-        [self dispError:@"既に保存されているアカウント名、IDと同じです"];
+//        [self dispError:@"既に保存されているアカウント名、IDと同じです"];
         return;
     }
     
     if([tfName.text isEqualToString:@""]){
-        tfName.text = [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"name"];
+        tfName.text = store[@"name"];
     }
     if([tfAccountId.text isEqualToString:@""]){
-        tfAccountId.text = [UICKeyChainStore keyChainStoreWithService:@"ichat"][@"account_id"];
+        tfAccountId.text = store[@"account_id"];
     }
     
     [[DataConnect sharedClient]
-     updateUsersWithDeviceKey:[UICKeyChainStore keyChainStoreWithService:@"ichat"][@"device_key"]
+     updateUsersWithDeviceKey:store[@"device_key"]
      accountId:tfAccountId.text
      name:tfName.text
     completion:^(NSDictionary *userInfo,
@@ -319,12 +438,13 @@
                   NSError *error){
         if(userInfo == nil || [userInfo isEqual:[NSNull null]]){
             NSLog(@"save error : null");
+            [self dispError:[NSString stringWithFormat:@"%@", error]];//ちゃんとエラーメッセージが返せるように変更しなくてはいけない
             return ;
         }else if([userInfo[@"succeed"] intValue] == 1){
             NSLog(@"succeed userinfo=%@",userInfo);
             
             
-            UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
+//            UICKeyChainStore *store = [UICKeyChainStore keyChainStoreWithService:@"ichat"];
 //            [[UICKeyChainStore keyChainStoreWithService:@"ichat"]
             [store
              setString:userInfo[@"user"][@"account_id"]
@@ -342,7 +462,8 @@
             NSLog(@"complete1");
             [SVProgressHUD showSuccessWithStatus:@"更新成功しました!"];
             
-            NSLog(@"complete = %@" , [UICKeyChainStore keyChainStoreWithService:@"ichat"]);
+            NSLog(@"complete = %@" , store);
+            //store = nil;
             return;
         }else if([userInfo[@"succeed"] intValue] == 0){
             
@@ -369,12 +490,32 @@
 }
 
 -(void)nextTextFieldActivate:(id)sender{
-    NSLog(@"nexttextfieldactivate %d", ((UITextField *)sender).tag);
-    if(((UITextField *)sender).tag == 0){
-        [tfAccountId becomeFirstResponder];
-    }else if(((UITextField *)sender).tag == 1){
-        //全てのキーボードを非表示にする
-//        [self.view endEditing:YES];//効かない？
+    
+    //sender.tag=(sectionNo)&(rowNo)
+    NSLog(@"nexttextfieldactivate %d", (int)((UITextField *)sender).tag);
+    NSLog(@"sender class = %@", [sender class]);
+    
+    
+    if([sender isKindOfClass:[UIBarButtonItem class]]){
+        if(((UIBarButtonItem *)sender).tag == 0){//section=0,row=0
+
+    //    if(sender == tfName){
+            [tfAccountId becomeFirstResponder];
+            
+        }else if(((UIBarButtonItem *)sender).tag == 1){//section=0,row=1
+            NSLog(@"bbb");
+            //全てのキーボードを非表示にする
+    //        [self.view endEditing:YES];//効かない？
+            [tfAccountId resignFirstResponder];
+        }else if(((UIBarButtonItem *)sender).tag == 10){//section=1,row=0
+            NSLog(@"意図しない番号");
+        }else if(((UIBarButtonItem *)sender).tag == 11){//section=1,row=1
+            NSLog(@"tapped textView");
+            
+            [tvIntro resignFirstResponder];
+        }else{
+            NSLog(@"else tag = %d", (int)[sender tag]);
+        }
     }
 }
 
@@ -427,5 +568,100 @@
     // Pass the selected object to the new view controller.
 }
 */
+
+-(void)tapBtnGenderChange:(id)sender{
+    NSLog(@"tapped button gender change : %@", sender);
+    
+    [self changeGenderBtnStatus];
+}
+
+-(void)changeGenderBtnStatus{
+    
+    intGender += 1;
+    intGender %= 2;
+    btnGender.layer.borderColor =
+    [(UIColor *)arrColorGender[intGender] CGColor];//[[UIColor redColor] CGColor];
+    btnGender.layer.cornerRadius = 10.0f;
+    //        [btnGender setTitle:arrGender[intGender] forState:UIControlStateNormal];
+    [btnGender setTitle:arrStrGender[intGender] forState:UIControlStateNormal];
+    [btnGender setTitleColor:arrColorGender[intGender] forState:UIControlStateNormal];
+}
+
+//uitextView delegate method
+-(void)textFieldDidBeginEditing:(UITextField *)textField{
+    
+    CGPoint pt;
+    CGRect rc = [textField bounds];
+    rc = [textField convertRect:rc toView:mainTableView];
+    pt = rc.origin;
+    pt.x = 0;
+    pt.y -= 60;
+    
+    //    [scrollView setContentOffset:pt animated:YES];
+    [mainTableView setContentOffset:pt animated:YES];
+    
+}
+-(void)textViewDidBeginEditing:(UITextView *)textView{
+//    NSLog(@"textViewDidBeginEditing %@", textView);
+//    
+//    CGPoint pnt = [mainTableView convertPoint:textView.bounds.origin fromView:mainTableView];
+//    NSLog(@"pnt = %f, %f", pnt.x, pnt.y);
+//    NSIndexPath* path = [mainTableView indexPathForRowAtPoint:pnt];
+//    NSLog(@"path = %@", path);
+//    [mainTableView
+//     scrollToRowAtIndexPath:path
+//     atScrollPosition:UITableViewScrollPositionTop
+//     animated:YES];
+    
+    
+    
+    CGPoint pt;
+    CGRect rc = [textView bounds];
+    //    rc = [textView convertRect:rc toView:scrollView];
+    rc = [textView convertRect:rc toView:mainTableView];
+    pt = rc.origin;
+    pt.x = 0;
+    pt.y -= 60;
+    
+    //    [scrollView setContentOffset:pt animated:YES];
+    [mainTableView setContentOffset:pt animated:YES];
+
+    
+    
+}
+
+-(void)textFieldDidEndEditing:(UITextField *)textField{
+    
+}
+
+
+//http://qiita.com/yimajo/items/d9409d83fecf9875061d
+//追加もしくは削除された後に動作する
+- (void)didMoveToParentViewController:(UIViewController *)parent{
+    if (![parent isEqual:self.parentViewController]) {
+        NSLog(@"back");
+        
+        
+//        UITextField *tfName;
+//        UITextField *tfAccountId;
+//        
+//        //indexPath.section=1
+//        UIButton *btnGender;
+//        UIButton *btnAddress;
+//        NSArray *arrStrGender;//性別：女性・男性
+//        int intGender;//0:女性・1:男性
+//        NSArray *arrColorGender;
+//        UITextView *tvIntro;
+        
+        NSLog(@"tfName = %@", tfName);
+        NSLog(@"tfAccountId = %@", tfAccountId);
+        NSLog(@"btnGender = %@", btnGender);
+        NSLog(@"tvIntro = %@", tvIntro);
+        
+        //メソッド内部で入力済みかどうか確認している：性別と自己紹介文はapi未対応
+        [self saveInfo];//まだnameとaccountIdのみしか入力できない
+        
+    }
+}
 
 @end

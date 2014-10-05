@@ -34,6 +34,7 @@
 		2AF1C78F1980154F0061A458 /* jin2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2AF1C78A1980154F0061A458 /* jin2.png */; };
 		2AF1C7901980154F0061A458 /* takkun.png in Resources */ = {isa = PBXBuildFile; fileRef = 2AF1C78B1980154F0061A458 /* takkun.png */; };
 		2AF1C7911980154F0061A458 /* tanaka.png in Resources */ = {isa = PBXBuildFile; fileRef = 2AF1C78C1980154F0061A458 /* tanaka.png */; };
+		2AFF856A19D1A54500CDBD95 /* PlaceHolderTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AFF856919D1A54500CDBD95 /* PlaceHolderTextView.m */; };
 		3838B5931D3B4B44A4EB73DA /* libPods-JSQMessagesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C703DEB479B409395055352 /* libPods-JSQMessagesTests.a */; };
 		44E73A51192D0B5B00D1C86F /* JSQMessagesCollectionViewFlowLayoutInvalidationContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E73A50192D0B5B00D1C86F /* JSQMessagesCollectionViewFlowLayoutInvalidationContext.m */; };
 		8816A69018E9250400111919 /* bubble.png in Resources */ = {isa = PBXBuildFile; fileRef = 8816A64918E9250400111919 /* bubble.png */; };
@@ -171,6 +172,8 @@
 		2AF1C78A1980154F0061A458 /* jin2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = jin2.png; sourceTree = SOURCE_ROOT; };
 		2AF1C78B1980154F0061A458 /* takkun.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = takkun.png; sourceTree = SOURCE_ROOT; };
 		2AF1C78C1980154F0061A458 /* tanaka.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tanaka.png; sourceTree = SOURCE_ROOT; };
+		2AFF856819D1A54500CDBD95 /* PlaceHolderTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlaceHolderTextView.h; path = JSQMessagesDemo/PlaceHolderTextView.h; sourceTree = SOURCE_ROOT; };
+		2AFF856919D1A54500CDBD95 /* PlaceHolderTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PlaceHolderTextView.m; path = JSQMessagesDemo/PlaceHolderTextView.m; sourceTree = SOURCE_ROOT; };
 		343577012CC24261BE4B61A1 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C703DEB479B409395055352 /* libPods-JSQMessagesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-JSQMessagesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		44E73A4F192D0B5B00D1C86F /* JSQMessagesCollectionViewFlowLayoutInvalidationContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSQMessagesCollectionViewFlowLayoutInvalidationContext.h; sourceTree = "<group>"; };
@@ -351,6 +354,8 @@
 				2AC97CCE19C7277800E5EB2D /* JSQSelectIdTableViewCell.h */,
 				2AC97CCF19C7277800E5EB2D /* JSQSelectIdTableViewCell.m */,
 				2AC97CD019C7277800E5EB2D /* JSQSelectIdTableViewCell.xib */,
+				2AFF856819D1A54500CDBD95 /* PlaceHolderTextView.h */,
+				2AFF856919D1A54500CDBD95 /* PlaceHolderTextView.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -744,7 +749,7 @@
 				ORGANIZATIONNAME = "Hexed Bits";
 				TargetAttributes = {
 					885D592818CBD13D00D77BB3 = {
-						DevelopmentTeam = 8ZAC8P584F;
+						DevelopmentTeam = Y7QGWHWRZ7;
 					};
 					885D594C18CBD13D00D77BB3 = {
 						DevelopmentTeam = 8ZAC8P584F;
@@ -849,7 +854,7 @@
 		};
 		2A59E0ED19C3484200F5F4C0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
@@ -947,6 +952,7 @@
 				2A23FF9A199F3993009BA3CD /* EditProfileTableViewController.m in Sources */,
 				2AB814B11981485600A8A499 /* BSDefaultViewObject.m in Sources */,
 				8816A6AA18E9250400111919 /* JSQMessagesToolbarButtonFactory.m in Sources */,
+				2AFF856A19D1A54500CDBD95 /* PlaceHolderTextView.m in Sources */,
 				8816A6A418E9250400111919 /* UIView+JSQMessages.m in Sources */,
 				8816A6A718E9250400111919 /* JSQMessagesAvatarFactory.m in Sources */,
 				2A81A642199FF89800C7E7E1 /* CommonAPI.m in Sources */,
@@ -1036,8 +1042,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Yuta Tsuruoka (4AVP478RB4)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Yuta Tsuruoka (4AVP478RB4)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Tsuyoshi Endo (9F7RPH86TF)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tsuyoshi Endo (9F7RPH86TF)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1055,8 +1061,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
-				PROVISIONING_PROFILE = "E6526B55-649C-4296-8433-08B26D8DEB92";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "E6526B55-649C-4296-8433-08B26D8DEB92";
+				PROVISIONING_PROFILE = "0bf066db-6b9f-4344-bc3b-bea17ae41ff5";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "0bf066db-6b9f-4344-bc3b-bea17ae41ff5";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1078,8 +1084,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: BASE INC. (8ZAC8P584F)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: BASE INC. (8ZAC8P584F)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Tsuyoshi Endo (Y7QGWHWRZ7)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Tsuyoshi Endo (Y7QGWHWRZ7)";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1090,8 +1096,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				PROVISIONING_PROFILE = "F4567989-106A-4EA1-B7E7-A7BD51FC7408";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F4567989-106A-4EA1-B7E7-A7BD51FC7408";
+				PROVISIONING_PROFILE = "38887dfa-8cc5-4ab1-9342-b9be8ef98715";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "38887dfa-8cc5-4ab1-9342-b9be8ef98715";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1104,8 +1110,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Tsuyoshi Endo (9F7RPH86TF)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tsuyoshi Endo (9F7RPH86TF)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -1116,7 +1122,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "0bf066db-6b9f-4344-bc3b-bea17ae41ff5";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "0bf066db-6b9f-4344-bc3b-bea17ae41ff5";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1127,8 +1134,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Tsuyoshi Endo (Y7QGWHWRZ7)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Tsuyoshi Endo (Y7QGWHWRZ7)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -1139,7 +1146,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "38887dfa-8cc5-4ab1-9342-b9be8ef98715";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "38887dfa-8cc5-4ab1-9342-b9be8ef98715";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
